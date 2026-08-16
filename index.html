@@ -1,0 +1,2298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marking Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style id="app-css">
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#152C4E;--slate:#3D5A85;--gold:#C9A227;--text:#2B2A26;--muted:#6B6558;--faint:#9B9587;--border:#E4E0D6;--surface:#F7F5EF;--white:#fff;--green-bg:#EAF3DE;--green-text:#3B6D11;--amber-bg:#FAEEDA;--amber-text:#854F0B;--blue-bg:#E6F1FB;--blue-text:#185FA5;--red-bg:#FCEBEB;--red-text:#A32D2D}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;color:var(--text);background:#F3F1EB;min-height:100vh}
+.topbar{background:var(--navy);color:#fff;padding:0 22px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;gap:12px}
+.topbar .brand{display:flex;flex-direction:column;justify-content:center;min-width:0;position:relative}
+.topbar h1{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .cur{font-size:11px;color:#8fa4c4;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .tabs{display:flex;gap:3px;justify-content:center}
+.topbar .tab{padding:7px 16px;border-radius:7px;border:none;background:rgba(255,255,255,.10);color:#b9c5dc;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:background .15s}
+.topbar .tab:hover{background:rgba(255,255,255,.18)}
+.topbar .tab.on{background:#fff;color:var(--navy)}
+.topbar .topbar-right{display:flex;justify-content:flex-end}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 18px 60px}
+h2.sec{font-size:18px;font-weight:600;color:var(--navy);margin:0 0 4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.btn{padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;color:var(--text);white-space:nowrap}
+.btn:hover{background:var(--surface)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.primary:hover{background:var(--slate)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.btn.danger{color:var(--red-text);border-color:#e8c4c4}
+.btn.danger:hover{background:var(--red-bg)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+/* library */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:18px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card .accent{height:6px;border-radius:4px;margin:-18px -18px 4px;border-top-left-radius:12px;border-top-right-radius:12px}
+.card h3{font-size:16px;color:var(--navy)}
+.card .q{font-size:12px;color:var(--muted);line-height:1.4}
+.card .meta{font-size:12px;color:var(--faint)}
+.card .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px;border-top:1px solid var(--surface)}
+.empty{background:#fff;border:1px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--muted)}
+/* forms */
+.panel{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:18px}
+.panel h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px;text-transform:uppercase;letter-spacing:.03em}
+label.fl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 4px}
+input[type=text],input[type=number],textarea,select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;color:var(--text);background:#fff}
+textarea{resize:vertical;min-height:54px;line-height:1.5}
+.fg{margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.subcard{border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:10px;background:var(--surface)}
+.subcard .hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.subcard .hd input{flex:1}
+.tagline{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.tagline input{flex:1}
+.chip-tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+.chip-tag.req{background:var(--green-bg);color:var(--green-text)}
+.chip-tag.bon{background:var(--amber-bg);color:var(--amber-text)}
+.ded-item{display:grid;grid-template-columns:1fr 90px 34px;gap:8px;margin-bottom:7px;align-items:center}
+.ded-item input[type=number]{text-align:center}
+.mk-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 34px;gap:8px;margin-bottom:7px;align-items:center}
+.x{border:none;background:#fff;border:1px solid var(--border);border-radius:6px;width:30px;height:30px;cursor:pointer;color:var(--red-text);font-weight:700;line-height:1}
+.x:hover{background:var(--red-bg)}
+.addline{font-size:12px}
+.colorrow{display:flex;align-items:center;gap:10px}
+.colorrow input[type=color]{width:46px;height:34px;padding:2px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer}
+/* marking preview */
+.mk-wrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+.mk-col-main,.mk-col-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.mk-col-side{position:sticky;top:16px}
+@media(max-width:900px){.mk-wrap{grid-template-columns:1fr}.mk-col-side{position:static}}
+.ded-fold{border:1px solid var(--border);border-radius:9px;margin-top:6px;background:var(--surface)}
+.ded-fold>summary{list-style:none;cursor:pointer;padding:11px 14px;font-weight:600;font-size:13px;color:var(--slate);display:flex;align-items:center;gap:8px}
+.ded-fold>summary::-webkit-details-marker{display:none}
+.ded-fold>summary::before{content:'▸';font-size:11px;color:var(--faint)}
+.ded-fold[open]>summary::before{content:'▾'}
+.ded-fold[open]>summary{border-bottom:1px solid var(--border)}
+.ded-fold>div{padding-left:14px;padding-right:14px}
+.mk-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.mk-card>.bar{padding:13px 18px;font-weight:700;color:#fff;font-size:14px;display:flex;align-items:center;gap:10px}
+.mk-card .body{padding:18px}
+.crit{border:1px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:hidden}
+.crit .ch{padding:11px 14px;background:var(--surface);display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600}
+.crit .ch .mx{margin-left:auto;font-size:12px;color:var(--faint);font-weight:600}
+.crit .key{padding:14px;border-top:1px solid var(--border);display:none}
+.crit.open .key{display:block}
+.crit .model{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:10px;white-space:pre-wrap}
+.crit .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.crit .note{font-size:12px;color:var(--muted);font-style:italic;border-left:3px solid var(--border);padding-left:10px}
+.dgroup{margin-bottom:16px}
+.dgroup .gn{font-weight:600;margin-bottom:8px;color:var(--slate)}
+.gn-input{font-weight:600;color:var(--slate);border:none;background:transparent;font-family:inherit;font-size:14px;padding:0;margin-bottom:8px;width:100%;outline:none;border-bottom:1px dashed transparent}
+.gn-input:hover,.gn-input:focus{border-bottom-color:var(--border)}
+.dopt{display:flex;align-items:center;gap:9px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;margin-bottom:6px;cursor:pointer}
+.dopt:hover{background:var(--surface)}
+.dopt input{margin:0}
+.dopt .pen{margin-left:auto;font-size:12px;font-weight:700;color:var(--red-text)}
+.score-strip{display:flex;gap:12px;flex-wrap:wrap;padding:14px 18px;background:var(--navy);color:#fff;border-radius:12px;align-items:center}
+.score-strip .blk{display:flex;flex-direction:column;line-height:1.2}
+.score-strip .blk .v{font-size:24px;font-weight:700}
+.score-strip .blk .l{font-size:11px;color:#b9c5dc;text-transform:uppercase;letter-spacing:.04em}
+.score-strip .final{margin-left:auto}
+.score-strip .final .v{font-size:34px}
+.chipbank{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 4px}
+.fchip{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:600}
+.fchip.on{background:var(--green-bg);color:var(--green-text);border-color:#bcd99a}
+.fchip.imp.on{background:var(--amber-bg);color:var(--amber-text);border-color:#e4c98a}
+.fb-out{width:100%;min-height:130px;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;line-height:1.55;background:var(--surface)}
+.notes{background:#FFF9E8;border:1px solid #f0e2b8}
+.hours .mk-line{display:grid;grid-template-columns:1fr;gap:10px}
+.htracker{border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:10px}
+.htracker .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.htracker .top .nm{font-weight:700;color:var(--navy)}
+.htracker .top .al{font-size:12px;color:var(--faint)}
+.progbar{height:8px;background:var(--surface);border-radius:6px;overflow:hidden;margin:9px 0 4px}
+.progbar i{display:block;height:100%;background:var(--navy)}
+.counter{display:flex;align-items:center;gap:8px}
+.counter button{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:700;font-size:16px}
+.hentry{display:grid;grid-template-columns:80px 1fr 34px;gap:8px;margin-top:7px;align-items:center}
+.muted{color:var(--muted)}
+.struct-row{display:grid;grid-template-columns:1fr 70px 150px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--surface)}
+.struct-row .sname{font-weight:600}
+.struct-row .smark{font-size:12px;color:var(--faint);text-align:right}
+.sbtn{padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-family:inherit;font-weight:700;text-align:center}
+.sbtn.unmarked{color:var(--faint)}
+.sbtn.correct{background:var(--green-bg);color:var(--green-text);border-color:#bcd99a}
+.sbtn.partial{background:var(--amber-bg);color:var(--amber-text);border-color:#e4c98a}
+.sbtn.incorrect{background:var(--red-bg);color:var(--red-text);border-color:#e8c4c4}
+.hide{display:none}
+/* dropdowns */
+.dd-wrap{position:relative;display:inline-block}
+.dd-menu{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:200px;z-index:60;display:none;flex-direction:column;padding:6px}
+.dd-menu.on{display:flex}
+.dd-item{padding:9px 13px;font-size:13px;font-family:inherit;font-weight:600;color:var(--text);background:none;border:none;text-align:left;cursor:pointer;border-radius:7px;white-space:nowrap}
+.dd-item:hover{background:var(--surface)}
+.dd-item.danger{color:var(--red-text)}
+.dd-item.danger:hover{background:var(--red-bg)}
+.dd-sep{height:1px;background:var(--border);margin:4px 0}
+.dd-label{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:6px 12px 2px}
+/* card action row */
+.card-actions{display:flex;gap:8px;align-items:center;margin-top:auto;padding-top:10px;border-top:1px solid var(--surface)}
+.card-actions .spacer{flex:1}
+.modal-back{position:fixed;inset:0;background:rgba(20,28,45,.6);z-index:90;display:none;align-items:center;justify-content:center}
+.modal-back.on{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;max-width:600px;width:calc(100vw - 32px);max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:16px;color:var(--navy);margin-bottom:4px}
+.modal .msub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.modal .preview{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.6}
+.modal .preview .crit-prev{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.modal .preview .crit-prev:last-child{border:none;margin:0;padding:0}
+.modal .preview .cn{font-weight:700;color:var(--navy);margin-bottom:3px}
+.modal .preview .cm{color:var(--muted);font-size:12px;margin-bottom:4px}
+.modal .preview .ctags{display:flex;flex-wrap:wrap;gap:5px}
+.modal .warn{background:var(--amber-bg);border:1px solid #e4c98a;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--amber-text);margin-bottom:14px}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end}
+.pill{font-size:11px;padding:2px 9px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);font-weight:600}
+.typenote{font-size:12px;line-height:1.5;color:var(--slate);background:var(--blue-bg);border:1px solid #cfe2f5;border-radius:7px;padding:9px 11px;margin-bottom:12px}
+.typenote b{color:var(--blue-text)}
+/* tour */
+.tourbtn{padding:7px 13px;border-radius:20px;border:1.5px solid rgba(201,162,39,.5);background:transparent;color:#E7C64F;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;letter-spacing:.02em;display:flex;align-items:center;gap:6px;transition:all .18s;animation:tourGlow 2.8s ease-in-out infinite}
+.tourbtn:hover{background:rgba(201,162,39,.16);color:#fff;border-color:var(--gold);animation:none;transform:translateY(-1px)}
+.tourbtn::before{content:'✦';font-size:10px;opacity:.9;transition:transform .3s}
+.tourbtn:hover::before{transform:rotate(90deg) scale(1.15)}
+@keyframes tourGlow{0%,100%{box-shadow:0 0 0 0 rgba(201,162,39,0)}50%{box-shadow:0 0 0 3px rgba(201,162,39,.16)}}
+/* type picker cards */
+.type-card{border:2px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;background:#fff;text-align:left;font-family:inherit;transition:all .15s;width:100%}
+.type-card:hover{border-color:var(--navy);background:var(--blue-bg)}
+.type-card .tc-icon{font-size:28px;margin-bottom:10px;display:block}
+.type-card .tc-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.type-card .tc-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.type-card .tc-tag{display:inline-block;margin-top:8px;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--surface);color:var(--faint);font-weight:600}
+/* snapshot toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#152C4E;color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:95;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.tour-back{position:fixed;inset:0;background:rgba(20,28,45,.55);z-index:80;display:none}
+.tour-back.on{display:block}
+.tour-spot{position:absolute;z-index:81;border-radius:10px;box-shadow:0 0 0 4px rgba(255,255,255,.9),0 0 0 9999px rgba(20,28,45,.55);transition:all .25s ease;pointer-events:none}
+.tour-pop{position:fixed;z-index:83;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;border-radius:12px;padding:18px 20px;width:min(420px,calc(100vw - 32px));box-shadow:0 14px 40px rgba(0,0,0,.35);display:none}
+.tour-pop.on{display:block}
+.tour-pop h4{font-size:15px;color:var(--navy);margin-bottom:6px}
+.tour-pop p{font-size:13px;line-height:1.55;color:var(--muted);margin-bottom:14px}
+.tour-pop .tnav{display:flex;align-items:center;gap:8px}
+.tour-pop .step-count{font-size:12px;color:var(--faint);margin-right:auto}
+h1,h2.sec,.card h3,.modal h3,.tour-pop h4,.type-card .tc-title,.score-strip .blk .v,.score-strip .final .v{font-family:'Source Serif 4',serif}
+.topbar h1{display:flex;align-items:center;gap:10px;font-family:'Source Serif 4',serif;font-weight:600}
+.logo-sq{width:29px;height:29px;border-radius:7px;background:var(--gold);display:inline-grid;place-items:center;font:700 15px 'Source Serif 4',serif;color:var(--navy);cursor:pointer}
+.logo-sq:hover{filter:brightness(1.06)}
+.glyph-opt{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:16px;display:grid;place-items:center;color:var(--navy)}
+.glyph-opt:hover{background:var(--surface);border-color:#C9BFA9}
+.glyph-opt.on{background:var(--gold);border-color:var(--gold)}
+.btn.gold{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.btn.gold:hover{background:#D9B540;border-color:#D9B540}
+.topbar .tab.on{background:rgba(255,255,255,.16);color:#fff}
+.topbar .tab[data-v=info]{color:var(--gold);border:none;background:transparent}
+.topbar .tab[data-v=info]:hover{background:rgba(201,162,39,.16);color:#E7C64F}
+.topbar .tab[data-v=info].on{background:var(--gold);color:var(--navy)}
+.topbar .tab{color:#A9BBD6}
+.card{box-shadow:0 1px 2px rgba(21,44,78,.04)}
+.card:hover{box-shadow:0 4px 14px rgba(21,44,78,.10);border-color:#C9BFA9}
+.score-strip .final .v{color:var(--gold)}
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.stat .v{font:700 26px 'Source Serif 4',serif;color:var(--navy)}
+.stat .l{font-size:11px;font-weight:500;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.editstat{outline:none;border-radius:5px;cursor:text}
+.editstat:hover{box-shadow:inset 0 -2px 0 rgba(201,162,39,.5)}
+.editstat:focus{box-shadow:inset 0 -2px 0 var(--gold)}
+.info-wrap{max-width:820px}
+.info-hero{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:16px}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px}
+.info-step{display:flex;gap:11px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:15px 16px}
+.info-n{flex:none;width:26px;height:26px;border-radius:7px;background:var(--navy);color:var(--gold);display:grid;place-items:center;font:700 13px 'Source Serif 4',serif}
+.info-step b{display:block;color:var(--navy);font-size:14px;margin-bottom:3px}
+.info-step span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.info-fh{font-size:18px;font-weight:600;color:var(--navy);margin:0 0 12px}
+.faq-list{display:flex;flex-direction:column;gap:9px}
+.faq{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.faq>summary{list-style:none;cursor:pointer;padding:13px 16px;font-weight:600;font-size:14px;color:var(--navy);display:flex;align-items:center;gap:10px}
+.faq>summary::-webkit-details-marker{display:none}
+.faq>summary::before{content:'+';font:700 16px 'IBM Plex Sans';color:var(--gold);width:14px}
+.faq[open]>summary::before{content:'\2013'}
+.faq-a{padding:0 16px 14px 40px;font-size:13px;color:var(--muted);line-height:1.6}
+.info-foot{margin-top:24px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--faint)}
+@media(max-width:700px){.info-grid{grid-template-columns:1fr}}
+.recover-bar{display:flex;align-items:center;gap:13px;background:#FBF3DC;border:1px solid #E7D49B;border-radius:11px;padding:12px 15px;margin-bottom:18px}
+.recover-bar .rec-ic{flex:none;width:30px;height:30px;border-radius:8px;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-size:17px;font-weight:700}
+.recover-bar b{display:block;color:#6B5B2A;font-size:13.5px}
+.recover-bar span{font-size:12px;color:#8A7A4A}
+.lib-sechead{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
+.lib-sechead h3{font-family:'Source Serif 4',serif;font-size:16px;color:var(--navy);margin:0}
+.lib-count{font-size:12px;font-weight:600;color:var(--faint);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1px 9px}
+.lib-subnote{font-size:12px;color:var(--faint)}
+.ex-box{border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:6px}
+.ex-box.open{background:#fff}
+.ex-bar{display:flex;align-items:center;gap:10px;width:100%;border:none;background:transparent;cursor:pointer;padding:12px 12px;font-family:inherit;text-align:left}
+.ex-bar:hover .ex-title{color:var(--gold)}
+.ex-caret{color:var(--faint);font-size:12px;transition:transform .15s}
+.ex-box.open .ex-caret{transform:rotate(90deg)}
+.ex-title{font-family:'Source Serif 4',serif;font-size:15px;font-weight:600;color:var(--navy)}
+.ex-hint{font-size:12px;color:var(--faint);margin-left:4px}
+.role-badge{cursor:pointer;font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:5px 11px;border-radius:20px;margin-right:10px}
+.role-badge:hover{background:rgba(255,255,255,.22)}
+.role-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;background:#fff}
+.role-card:hover{border-color:var(--gold);background:var(--surface)}
+.role-card b{display:block;color:var(--navy);font-size:14px}
+.role-card span{display:block;font-size:12px;color:var(--muted);line-height:1.45;margin:2px 0 8px}
+.lockchip{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--surface);color:var(--faint);border:1px solid var(--border)}
+.sec-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.sec-row:last-child{border-bottom:none}
+.sec-row .sr-txt{flex:1}
+.sec-row .sr-txt b{display:block;color:var(--navy);font-size:13.5px}
+.sec-row .sr-txt span{font-size:12px;color:var(--muted);line-height:1.45}
+.toggle{width:42px;height:24px;border-radius:14px;background:#CFC8B8;position:relative;cursor:pointer;flex:none;transition:background .15s;border:none}
+.toggle.on{background:var(--gold)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.toggle.on::after{left:20px}
+.stat.dark{background:var(--navy);border-color:var(--navy)}
+.stat.dark .v{color:var(--gold)}
+.stat.dark .l{color:#A9BBD6}
+.seg{display:flex;background:#EAE6DB;border-radius:9px;padding:3px;gap:2px}
+.segbtn{padding:6px 13px;border-radius:7px;border:none;cursor:pointer;font:600 12px 'IBM Plex Sans',sans-serif;background:transparent;color:var(--muted)}
+.segbtn.on{background:var(--navy);color:#fff}
+#libSearch{width:230px}
+.mk-card>.bar{font-family:'Source Serif 4',serif;font-size:15px;letter-spacing:.01em}
+.crit .ch{font-size:13.5px}
+@media(max-width:820px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}.score-strip .final{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <h1><span class="logo-sq" title="Click to change icon" onclick="toggleGlyphPicker(event)">✓</span>Marking Studio</h1>
+    <div id="glyphPicker" style="display:none;position:absolute;top:52px;left:16px;z-index:200;background:#fff;border:1px solid #E4E0D6;border-radius:12px;box-shadow:0 12px 34px rgba(21,44,78,.22);padding:11px;gap:8px;grid-template-columns:repeat(6,1fr)"></div>
+    <div class="cur" id="curName">No assessment open</div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-v="library" onclick="go('library')">Library</button>
+    <button class="tab" data-v="setup" onclick="go('setup')">Setup</button>
+    <button class="tab" data-v="marking" onclick="go('marking')">Marking</button>
+    <button class="tab" data-v="info" onclick="go('info')">Info</button>
+  </div>
+  <div class="topbar-right">
+    <span id="roleBadge" class="role-badge" style="display:none" onclick="openLock()"></span>
+    <button class="tourbtn" onclick="startTour()">Take a tour</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+  <div id="view-library"></div>
+  <div id="view-setup" class="hide"></div>
+  <div id="view-marking" class="hide"></div>
+  <div id="view-info" class="hide"></div>
+</div>
+<!-- new assessment type picker -->
+<div class="modal-back" id="previewModal">
+  <div class="modal" style="max-width:1080px;width:calc(100vw - 40px);max-height:90vh;padding:0;overflow:hidden;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--border);background:var(--surface)">
+      <span class="pill" style="background:var(--gold);color:var(--navy)">Preview</span>
+      <div style="font-family:'Source Serif 4',serif;font-weight:600;color:var(--navy)" id="previewTitle">Marking tool preview</div>
+      <div style="font-size:12px;color:var(--muted)">This is exactly what markers will see. Nothing is saved yet.</div>
+      <div style="flex:1"></div>
+      <button class="btn" onclick="closePreview()">Close</button>
+      <button class="btn gold" onclick="saveFromPreview()">Looks good — Save</button>
+    </div>
+    <div id="previewBody" style="overflow-y:auto;padding:18px 20px;background:#F3F1EB"></div>
+  </div>
+</div>
+<div class="modal-back" id="lockOverlay" style="z-index:120;background:linear-gradient(160deg,#152C4E,#0E1E38)">
+  <div class="modal" style="max-width:440px;text-align:center">
+    <div style="width:46px;height:46px;border-radius:11px;background:var(--gold);color:var(--navy);display:grid;place-items:center;font:700 24px 'Source Serif 4',serif;margin:0 auto 12px">✓</div>
+    <h3 style="font-size:19px">Marking Studio</h3>
+    <div class="msub" id="lockSub">Choose how you're using the tool.</div>
+    <div id="lockBody"></div>
+  </div>
+</div>
+<div class="modal-back" id="securityModal">
+  <div class="modal" style="max-width:620px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <h3 style="margin:0">🔐 Access &amp; Security</h3><div style="flex:1"></div>
+      <button class="btn" onclick="closeSecurity()">Close</button>
+    </div>
+    <div class="msub">Admin controls for who can see and change what on this copy. <a href="#" onclick="go('info');closeSecurity();return false" style="color:var(--slate)">How is my data handled?</a></div>
+    <div id="securityBody"></div>
+  </div>
+</div>
+<div class="modal-back" id="typePickerModal">
+  <div class="modal" style="max-width:500px">
+    <h3>What kind of assessment?</h3>
+    <div class="msub">Choose a type — the rubric is pre-seeded with the right defaults. You can change everything in Setup.</div>
+    <div id="typePickerCards" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px"></div>
+    <div class="acts"><button class="btn" onclick="closeTypePicker()">Cancel</button></div>
+  </div>
+</div>
+<!-- import criteria modal -->
+<div class="modal-back" id="importModal">
+  <div class="modal">
+    <h3>Import criteria from template</h3>
+    <div class="msub">Paste your answer key below. The standard video-assessment deductions, feedback chips and score bands will be added automatically.</div>
+    <div class="fg"><textarea id="importPaste" style="min-height:220px;font-family:monospace;font-size:12px" placeholder="Paste your template text here..."></textarea></div>
+    <div id="importPreview"></div>
+    <div class="acts">
+      <button class="btn" onclick="closeImportModal()">Cancel</button>
+      <button class="btn primary" onclick="parseAndPreview()">Preview →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ STORAGE ============ */
+var LS_KEY='mtb_assessments_v4';
+var LS_PROG='mtb_progress_v1';
+function loadAll(){try{var r=localStorage.getItem(LS_KEY);if(!r)return null;if(isEnc(r))return null;return JSON.parse(r)}catch(e){return null}}
+function saveAll(){
+  var json=JSON.stringify(state.assessments);
+  if(sec.encrypt&&_aesKey){encStr(json).then(function(c){try{localStorage.setItem(LS_KEY,c)}catch(e){}});}
+  else{try{localStorage.setItem(LS_KEY,json)}catch(e){}}
+}
+function isEnc(s){return typeof s==='string'&&s.indexOf('ENC1:')===0}
+function storedIsEncrypted(){try{return isEnc(localStorage.getItem(LS_KEY))||isEnc(localStorage.getItem(LS_PROG))}catch(e){return false}}
+async function encStr(plain){var iv=crypto.getRandomValues(new Uint8Array(12));var ct=await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},_aesKey,new TextEncoder().encode(plain));return 'ENC1:'+_b64(iv)+':'+_b64(ct)}
+async function decStr(s){var p=s.slice(5).split(':');var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:_fromB64(p[0])},_aesKey,_fromB64(p[1]));return new TextDecoder().decode(pt)}
+function loadProg(){try{var r=localStorage.getItem(LS_PROG);if(!r)return{};if(isEnc(r))return{};return JSON.parse(r)}catch(e){return{}}}
+function saveProg(){
+  var json=JSON.stringify(state.progress);
+  if(sec.encrypt&&_aesKey){encStr(json).then(function(c){try{localStorage.setItem(LS_PROG,c)}catch(e){}});}
+  else{try{localStorage.setItem(LS_PROG,json)}catch(e){}}
+}
+
+/* ============ ACCESS & SECURITY ============ */
+var EXAMPLE_IDS={trendelenburg:1,foramina_additive:1,foramina_deduct:1};
+function isExample(a){return !!(a&&EXAMPLE_IDS[a.id]);}
+
+var LS_SEC='mtb_security_v1';
+var sec={setup:false,passHash:null,salt:null,encrypt:false,anonymise:false,roster:[],admins:[]};
+(function(){try{var r=localStorage.getItem(LS_SEC);if(r)sec=Object.assign(sec,JSON.parse(r));}catch(e){}})();
+function saveSec(){try{localStorage.setItem(LS_SEC,JSON.stringify(sec));}catch(e){}}
+
+/* session role lives in sessionStorage so it clears when the browser is closed */
+var session={role:'admin',markerName:null};
+(function(){
+  if(!sec.setup){session.role='admin';return;}
+  try{
+    var r=sessionStorage.getItem('mtb_role'), n=sessionStorage.getItem('mtb_markername');
+    if(r){session.role=r;session.markerName=n||null;}
+    else{session.role=null;} /* locked until the user chooses */
+  }catch(e){session.role=null;}
+})();
+function persistSession(){try{sessionStorage.setItem('mtb_role',session.role||'');sessionStorage.setItem('mtb_markername',session.markerName||'');}catch(e){}}
+
+/* ---- capability model ---- */
+function can(action,a){
+  var r=session.role;
+  if(r==='admin')return true;
+  if(r==='viewer')return action==='view'||action==='mark-view';
+  if(r==='marker'){
+    switch(action){
+      case 'view': case 'mark': case 'create': case 'settings': return true;
+      case 'edit': return a?!isExample(a):true;
+      case 'delete': case 'archive': case 'access': case 'security': return false;
+      default: return false;
+    }
+  }
+  return false; /* locked */
+}
+function visibleToSession(a){
+  if(session.role==='admin'||session.role==='viewer')return true;
+  if(session.role!=='marker')return false;
+  var v=a.visibleTo;
+  if(!v||v==='all')return true;
+  if(Array.isArray(v))return !!(session.markerName&&v.indexOf(session.markerName)>=0);
+  return true;
+}
+function rosterNames(){
+  var set={};
+  (sec.roster||[]).forEach(function(n){if(n&&n.trim())set[n.trim()]=1;});
+  state.assessments.forEach(function(a){(a.markers||[]).forEach(function(m){if(m.name&&m.name.trim())set[m.name.trim()]=1;});});
+  return Object.keys(set);
+}
+
+/* ---- passcode hashing (PBKDF2 / SHA-256) ---- */
+function _b64(buf){return btoa(String.fromCharCode.apply(null,new Uint8Array(buf)));}
+function _fromB64(s){var b=atob(s);var u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+async function _deriveBits(pass,salt){
+  var enc=new TextEncoder();
+  var key=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveBits','deriveKey']);
+  return {key:key,bits:await crypto.subtle.deriveBits({name:'PBKDF2',salt:salt,iterations:120000,hash:'SHA-256'},key,256)};
+}
+async function hashPass(pass,saltB64){
+  var salt=saltB64?_fromB64(saltB64):crypto.getRandomValues(new Uint8Array(16));
+  var d=await _deriveBits(pass,salt);
+  return {hash:_b64(d.bits),salt:_b64(salt)};
+}
+async function verifyPass(pass){
+  if(!sec.passHash||!sec.salt)return false;
+  var h=await hashPass(pass,sec.salt);
+  return h.hash===sec.passHash;
+}
+async function deriveAesKey(pass,saltB64){
+  var enc=new TextEncoder();
+  var base=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:_fromB64(saltB64),iterations:120000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+var _aesKey=null; /* held in memory after unlock, never persisted */
+
+/* ============ SEED: TRENDELENBURG ============ */
+function seed(){
+  var foramina=[
+    {name:'Optic canal',labelMarks:1,lostFeedback:'Optic canal — label not identified.',contents:[{text:'CN II (optic nerve)',marks:0.5,lostFeedback:'CN II / optic nerve not named.'},{text:'Ophthalmic artery',marks:0.5,lostFeedback:'Ophthalmic artery not named.'}]},
+    {name:'Foramen rotundum',labelMarks:1,lostFeedback:'Foramen rotundum — label not identified.',contents:[{text:'CN V2 (maxillary nerve)',marks:1,lostFeedback:'CN V2 / maxillary nerve not named.'}]},
+    {name:'Foramen ovale',labelMarks:1,lostFeedback:'Foramen ovale — label not identified; commonly confused with rotundum.',contents:[{text:'CN V3 (mandibular nerve)',marks:1,lostFeedback:'CN V3 / mandibular nerve not named.'}]},
+    {name:'Foramen spinosum',labelMarks:1,lostFeedback:'Foramen spinosum — label not identified.',contents:[{text:'Middle meningeal artery',marks:1,lostFeedback:'Middle meningeal artery not named.'}]},
+    {name:'Internal acoustic meatus',labelMarks:1,lostFeedback:'Internal acoustic meatus — label not identified.',contents:[{text:'CN VII (facial nerve)',marks:0.5,lostFeedback:'CN VII / facial nerve not named.'},{text:'CN VIII (vestibulocochlear)',marks:0.5,lostFeedback:'CN VIII / vestibulocochlear nerve not named.'}]},
+    {name:'Jugular foramen',labelMarks:1,lostFeedback:'Jugular foramen — label not identified.',contents:[{text:'CN IX, X, XI',marks:0.5,lostFeedback:'CN IX, X, XI not named.'},{text:'Internal jugular vein',marks:0.5,lostFeedback:'Internal jugular vein not named.'}]},
+    {name:'Hypoglossal canal',labelMarks:1,lostFeedback:'Hypoglossal canal — label not identified.',contents:[{text:'CN XII (hypoglossal nerve)',marks:1,lostFeedback:'CN XII / hypoglossal nerve not named.'}]},
+    {name:'Foramen magnum',labelMarks:1,lostFeedback:'Foramen magnum — label not identified.',contents:[{text:'Medulla / spinal cord',marks:0.5,lostFeedback:'Medulla / spinal cord not named.'},{text:'Vertebral arteries',marks:0.25,lostFeedback:'Vertebral arteries not named.'},{text:'CN XI (spinal root)',marks:0.25,lostFeedback:'CN XI spinal root not named.'}]}
+  ];
+  var foraminaBands=[
+    {min:14,max:16,text:'A strong labelling response — the great majority of foramina and their contents are correctly identified.'},
+    {min:11,max:13.99,text:'A solid response with most foramina correct; a few labels need revisiting.'},
+    {min:7,max:10.99,text:'A partial response — several foramina are missing or mislabelled and would benefit from review.'},
+    {min:0,max:6.99,text:'This response needs further work; many of the foramina and their contents require revision.'}
+  ];
+  var foraminaMarkers=[
+    {name:'Vandana',hours:18,students:289},
+    {name:'Andy',hours:12,students:198},
+    {name:'Lucy',hours:10,students:157}
+  ];
+  function checklist(id,title,mode){
+    return {id:id,title:title,question:'Label the cranial foramina indicated on the skull base and, for each, name the principal structure(s) passing through it.',
+      accent:(mode==='deduct'?'#6D2E46':'#1F6F5C'),type:'checklist',scoreMode:mode,
+      labelSteps:[1,0.75,0.5,0.25,0],
+      contentSteps:[1,0.5,0],
+      structures:JSON.parse(JSON.stringify(foramina)),
+      criteria:[],deductionGroups:[],baseScore:0,
+      strengths:['Accurate identification','Correct contents named','Logical fossa-by-fossa order','Clear annotation'],
+      improvements:['Re-check the contents named','Distinguish rotundum from ovale','Label the fossa each foramen sits in'],
+      openingBands:JSON.parse(JSON.stringify(foraminaBands)),
+      markers:JSON.parse(JSON.stringify(foraminaMarkers))};
+  }
+  return [{
+    id:'trendelenburg',
+    title:'Q30 — Lower Limb Trendelenburg Gait',
+    question:'Record a short video explaining the Trendelenburg gait: the muscles and nerve involved, the mechanism of the abnormal gait, and the clinical sign observed.',
+    accent:'#1F3864',
+    type:'deduction',scoreMode:'additive',structures:[],
+    baseScore:30,
+    criteria:[
+      {title:'Muscles & nerve',max:0,model:'Gluteus medius and gluteus minimus, supplied by the superior gluteal nerve (L4, L5, S1).',required:['Gluteus medius','Gluteus minimus','Superior gluteal nerve'],bonus:['Tensor fasciae latae'],note:'Look for the nerve named explicitly, not just the muscles.'},
+      {title:'Mechanism',max:0,model:'Weak hip abductors on the affected side fail to stabilise the pelvis when the opposite leg is lifted, so the pelvis drops on the unsupported (swing) side.',required:['Pelvis drops on contralateral side','Abductor weakness on stance side'],bonus:['Compensatory trunk lean'],note:'The pelvis drops on the side OPPOSITE the lesion — a common error.'},
+      {title:'Clinical sign & correlation',max:0,model:'Positive Trendelenburg sign; gait shows a lurch/trunk lean toward the affected side to keep balance.',required:['Names the sign','Describes the lurch/lean'],bonus:['Relevant clinical cause e.g. superior gluteal nerve injury, hip pathology'],note:''}
+    ],
+    deductionGroups:[
+      {name:'Anatomical accuracy',type:'radio',items:[{label:'Minor error',penalty:2},{label:'Major error',penalty:5},{label:'Multiple errors',penalty:8}]},
+      {name:'Mechanism explanation',type:'radio',items:[{label:'Partially correct',penalty:3},{label:'Incorrect / wrong side',penalty:6}]},
+      {name:'Required structures omitted',type:'checkbox',items:[{label:'Gluteus medius not named',penalty:2},{label:'Gluteus minimus not named',penalty:2},{label:'Superior gluteal nerve not named',penalty:3}]},
+      {name:'Clinical correlation',type:'radio',items:[{label:'Vague / generic',penalty:2},{label:'Absent',penalty:4}]},
+      {name:'Presentation quality',type:'checkbox',items:[{label:'Unclear delivery',penalty:1},{label:'Illogical sequence',penalty:1},{label:'No interaction with visuals',penalty:1},{label:'Reading from notes',penalty:1}]},
+      {name:'Video quality',type:'checkbox',items:[{label:'Student not physically present in video',penalty:2},{label:'Poor audio quality',penalty:1},{label:'Poor video quality',penalty:1},{label:'Incorrect pronunciation of anatomical terms',penalty:1}]},
+      {name:'Timing',type:'radio',items:[{label:'Over / under length',penalty:2}]},
+      {name:'File requirements',type:'checkbox',items:[{label:'Not MP4 format',penalty:1},{label:'Student name not in filename',penalty:1},{label:'Student name not mentioned in assignment',penalty:1}]},
+      {name:'Custom deduction',type:'custom',items:[]}
+    ],
+    strengths:['Clear explanation of the mechanism','Accurate anatomy','Logical sequence','Good use of visuals','Confident delivery','Correct clinical correlation'],
+    improvements:['Clarify the muscle action','Name the nerve involved','Correct the side the pelvis drops','Engage more with the visuals','Avoid reading from notes','Tighten the timing'],
+    openingBands:[
+      {min:27,max:30,text:'This is a strong, well-structured response that demonstrates a clear understanding of the gait mechanism and the relevant anatomy.'},
+      {min:22,max:26.99,text:'This is a solid response with a sound grasp of the key concepts; a few areas would benefit from greater precision.'},
+      {min:15,max:21.99,text:'This response addresses the question but contains gaps in anatomical detail or explanation that affect the overall clarity.'},
+      {min:0,max:14.99,text:'This response needs further development; several core elements of the gait mechanism and anatomy require revision.'}
+    ],
+    markers:[
+      {name:'Vandana',hours:35,students:289},
+      {name:'Andy',hours:24,students:198},
+      {name:'Lucy',hours:19,students:157}
+    ]
+  },
+  checklist('foramina_additive','Skull — Cranial Foramina (labelling · additive)','additive'),
+  checklist('foramina_deduct','Skull — Cranial Foramina (labelling · deduct from total)','deduct')
+  ];
+}
+
+/* ============ STATE ============ */
+var state={assessments:loadAll()||seed(),progress:loadProg(),view:'library',editingId:null,markingId:null,draft:null};
+function normalizeAssessments(){
+state.assessments.forEach(function(a){
+  if(!a.type)a.type='deduction';if(!a.scoreMode)a.scoreMode='additive';
+  if(!a.structures)a.structures=[];if(!a.criteria)a.criteria=[];
+  if(!a.deductionGroups)a.deductionGroups=[];if(a.baseScore==null)a.baseScore=0;
+  if(!a.labelSteps)a.labelSteps=[1,0.75,0.5,0.25,0];
+  if(!a.contentSteps)a.contentSteps=[1,0.5,0];
+  if(a.visibleTo==null)a.visibleTo='all';
+  /* migrate old marks→labelMarks and add contents if missing */
+  a.structures.forEach(function(s){
+    if(s.labelMarks==null)s.labelMarks=s.marks||1;
+    if(!s.contents)s.contents=[];
+  });
+});
+}
+normalizeAssessments();
+if(!loadAll()&&!storedIsEncrypted())saveAll();
+
+function uid(){return 'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function find(id){return state.assessments.find(function(a){return a.id===id})}
+function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function prog(id){if(!state.progress[id])state.progress[id]={};return state.progress[id]}
+
+/* ============ NAV ============ */
+function go(v){
+  state.view=v;
+  ['library','setup','marking','info'].forEach(function(x){
+    document.getElementById('view-'+x).classList.toggle('hide',x!==v);
+  });
+  document.querySelectorAll('.topbar .tab').forEach(function(t){t.classList.toggle('on',t.dataset.v===v)});
+  updateTabVisibility();
+  if(v==='library')renderLibrary();
+  if(v==='setup')renderSetup();
+  if(v==='marking')renderMarking();
+  if(v==='info')renderInfo();
+}
+function updateTabVisibility(){
+  var sTab=document.querySelector('.topbar .tab[data-v=setup]');
+  var mTab=document.querySelector('.topbar .tab[data-v=marking]');
+  if(sTab)sTab.style.display=(state.draft||state.view==='setup')?'':'none';
+  if(mTab)mTab.style.display=(state.markingId||state.view==='marking')?'':'none';
+}
+function curLabel(){
+  var a=state.markingId?find(state.markingId):(state.editingId?find(state.editingId):null);
+  var el=document.getElementById('curName');
+  if(state.view==='library'||state.view==='info'){el.textContent='';el.style.display='none';return;}
+  el.style.display='';
+  el.textContent=a?('Open: '+a.title):'No assessment open';
+}
+
+/* ============ INFO ============ */
+var FAQ=[
+  ['Where is my data stored?','Everything lives in this browser on your own device. There are no accounts and nothing is uploaded — your rubrics, marking progress and student names never leave your machine.'],
+  ['Does it need installing or internet?','No. It is a single web page that runs in any modern browser. An exported marking tool works fully offline as a self-contained file.'],
+  ['Can several markers share one rubric?','Yes. From a card\u2019s \u22ef menu choose \u201cExport marking tool (HTML)\u201d and send the file. Every co-marker opens an identical tool, so the whole team marks against the same rubric, penalties and feedback wording.'],
+  ['What are the two assessment types?','Deduction works from a base score downward — you flag errors and penalties are subtracted. Checklist builds a mark from structures and items, either additive (tap to award) or deduct-from-total (tap to flag).'],
+  ['Will I lose work if I close the tab?','No. Rubrics and marking progress persist automatically. Use \uD83D\uDCF8 Snapshot before big edits, and Export for a portable backup you control.'],
+  ['I accidentally deleted or cancelled something — can I get it back?','Yes. While building an assessment, press Ctrl+Z (Ctrl+Shift+Z to redo) to undo changes. If you cancel a new assessment, it is auto-saved and offered back on the Library as a “Restore unsaved draft” banner.'],
+  ['Can I check an assessment before saving it?','Yes. In the Builder, click 👁 Preview to see exactly the marking tool it will generate, live, before you commit.'],
+  ['Who can see and change assessments?','A person in charge can set an Admin passcode from the 🔐 Access panel. Admins have full control; others are Markers (mark assigned assessments, edit rubrics, log hours) or View-only. Markers see only assessments assigned to them, and the built-in examples are protected.'],
+  ['How do I keep student data private?','Data already stays on your device. For extra protection, an Admin can encrypt the saved data with the passcode, and turn on “Anonymise on export” to strip names from any shared file.'],
+  ['How do I move a rubric to another computer?','Export the rubric as JSON (card \u22ef menu), then on the other machine use Import \u25be \u2192 Import full JSON rubric.']
+];
+function renderInfo(){
+  var el=document.getElementById('view-info');
+  var faq=FAQ.map(function(q){
+    return '<details class="faq"><summary>'+esc(q[0])+'</summary><div class="faq-a">'+esc(q[1])+'</div></details>';
+  }).join('');
+  el.innerHTML=
+    '<div class="info-wrap">'+
+      '<div class="info-hero">'+
+        '<h2 class="sec" style="font-size:22px;margin-bottom:6px">About Marking Studio</h2>'+
+        '<p style="font-size:14px;color:var(--muted);line-height:1.6;margin:0;max-width:70ch">Marking Studio turns your own rubric into a purpose-built marking tool. Build the rubric once in the Builder, mark against it with a live running score and one-click feedback, and hand co-markers an identical, self-contained copy. It installs nothing, runs entirely in your browser, and keeps student work on your device.</p>'+
+      '</div>'+
+      '<div class="info-grid">'+
+        '<div class="info-step"><div class="info-n">1</div><div><b>Library</b><span>Every assessment in one place, with search, filters and an at-a-glance overview.</span></div></div>'+
+        '<div class="info-step"><div class="info-n">2</div><div><b>Builder</b><span>Turn a plain rubric into model answers, weighted deductions, checklists and feedback banks.</span></div></div>'+
+        '<div class="info-step"><div class="info-n">3</div><div><b>Marking</b><span>Answer key, controls and live score side by side; feedback assembles itself and stays editable.</span></div></div>'+
+      '</div>'+
+      '<h3 class="info-fh">Frequently asked questions</h3>'+
+      '<div class="faq-list">'+faq+'</div>'+
+      '<h3 class="info-fh" style="margin-top:26px">Security &amp; data privacy</h3>'+
+      '<div style="background:#fff;border:1px solid var(--border);border-radius:11px;padding:18px 20px;font-size:13px;line-height:1.65;color:var(--muted)">'+
+        '<p style="margin:0 0 10px"><b style="color:var(--navy)">Runs entirely on your device.</b> Marking Studio is a single web page with no server, no accounts and no internet dependency. Rubrics and marking records are stored only in this browser, on this computer. Nothing is ever uploaded, and student work never leaves the machine unless you deliberately export a file.</p>'+
+        '<p style="margin:0 0 10px"><b style="color:var(--navy)">Roles &amp; access control.</b> A person in charge can set an <b>Admin passcode</b>. Anyone holding it has full control; everyone else is limited to <b>Marker</b> or <b>View-only</b>. Markers see only assessments assigned to them, and the built-in example assessments are protected from deletion or edits.</p>'+
+        '<p style="margin:0 0 10px"><b style="color:var(--navy)">Encryption.</b> Admins can encrypt the stored data so it cannot be read without the passcode. Because there is no server, if the passcode is lost, encrypted data cannot be recovered.</p>'+
+        '<p style="margin:0 0 10px"><b style="color:var(--navy)">Sharing safely.</b> Anonymise on export strips staff and student identifiers from any exported marking tool or backup.</p>'+
+        '<p style="margin:0"><b style="color:var(--navy)">Honest limitation.</b> Because the tool is file-based rather than server-enforced, roles are a strong deterrent and encryption protects stored data, but a determined technical user with the file and passcode could still access it. It is designed for trusted teaching teams, not as a substitute for institutional identity systems.</p>'+
+      '</div>'+
+      (can('access')?'<div style="margin-top:14px"><button class="btn gold" onclick="go(\'library\');setTimeout(openSecurity,60)">🔐 Open Access &amp; Security settings</button></div>':'')+
+      '<div class="info-foot">Developed by Vandana Nathan \u00b7 A BMS Take Home Assessment Marker of 3 cohorts</div>'+
+    '</div>';
+  curLabel();
+}
+
+/* ============ LIBRARY ============ */function statOverrides(){try{var r=localStorage.getItem('mtb_statoverrides_v1');return r?JSON.parse(r):{}}catch(e){return{}}}
+function statKey(e){if(e.key==='Enter'){e.preventDefault();e.target.blur();}}
+function setStat(el){
+  var key=el.getAttribute('data-stat');
+  var n=parseFloat((el.textContent||'').replace(/[^0-9.]/g,''));
+  var ov=statOverrides();
+  if(isNaN(n))delete ov[key]; else ov[key]=n;
+  try{localStorage.setItem('mtb_statoverrides_v1',JSON.stringify(ov));}catch(e){}
+  renderLibrary();
+}
+function draftRecoveryBanner(){
+  var bk=readDraftBackup();
+  if(!bk||!bk.draft)return '';
+  if(find(bk.draft.id))return ''; /* it was saved */
+  if(state.view==='setup'&&state.draft&&state.draft.id===bk.draft.id)return ''; /* currently editing it */
+  var t=(bk.draft.title||'').trim()||'Untitled assessment';
+  var when=new Date(bk.ts||Date.now());
+  var ago=Math.max(1,Math.round((Date.now()-(bk.ts||Date.now()))/60000));
+  return '<div class="recover-bar">'+
+    '<span class="rec-ic">↺</span>'+
+    '<div style="flex:1"><b>Unsaved draft recovered</b><span>“'+esc(t)+'” — last auto-saved '+ago+' min ago. It was not saved to your library.</span></div>'+
+    '<button class="btn gold" onclick="restoreDraft()">Restore draft</button>'+
+    '<button class="btn" onclick="dismissDraftBackup()">Dismiss</button>'+
+  '</div>';
+}
+function renderLibrary(){
+  var el=document.getElementById('view-library');
+  var settingsItems=
+    '<button class="dd-item" onclick="snapshotAll();closeDD()">📸 Snapshot all</button>';
+  if(can('access')){
+    settingsItems+=
+      '<div class="dd-sep"></div>'+
+      '<div class="dd-label">Import</div>'+
+      '<button class="dd-item" onclick="openImportModal();closeDD()">Paste criteria from template</button>'+
+      '<button class="dd-item" onclick="downloadBlankTemplate();closeDD()">Download blank template</button>'+
+      '<button class="dd-item" onclick="importJSON();closeDD()">Import full JSON rubric</button>'+
+      '<div class="dd-sep"></div>'+
+      '<button class="dd-item" onclick="openSecurity();closeDD()">🔐 Access &amp; Security</button>';
+  }
+  var newBtn='';
+  var head=
+    '<div class="row" style="margin-bottom:20px">'+
+      '<div><h2 class="sec">Assessment library</h2>'+
+        '<div class="sub">Open to mark, edit the rubric, or export a standalone tool for your team.</div></div>'+
+      '<div class="spacer"></div>'+
+      '<div class="dd-wrap">'+
+        '<button class="btn" onclick="toggleDD(\'ddSettings\',event)">⚙ Settings ▾</button>'+
+        '<div class="dd-menu" id="ddSettings" style="min-width:210px">'+settingsItems+'</div>'+
+      '</div> '+
+      newBtn+
+    '</div>';
+  if(!state.assessments.length){
+    el.innerHTML=head+draftRecoveryBanner()+'<div class="empty">No assessments yet. Start with <b>New assessment</b> or import a rubric.</div>';
+    curLabel();return;
+  }
+  var mkSet={},hrs=0,studs=0;
+  state.assessments.forEach(function(a){(a.markers||[]).forEach(function(m){if(m.name)mkSet[m.name]=1;hrs+=parseFloat(m.hours)||0;studs+=parseFloat(m.students)||0})});
+  var ov=statOverrides();
+  var vStud=(ov.students!=null?ov.students:Math.round(studs));
+  var vMk=(ov.markers!=null?ov.markers:Object.keys(mkSet).length);
+  var vHrs=(ov.hours!=null?ov.hours:Math.round(hrs*10)/10);
+  var ownCountForStat=state.assessments.filter(function(a){return !isExample(a)}).length;
+  var stats='<div class="stats-strip">'+
+    '<div class="stat"><div class="v">'+ownCountForStat+'</div><div class="l">Your assessments</div></div>'+
+    '<div class="stat"><div class="v editstat" title="Click to edit" contenteditable="true" data-stat="students" onblur="setStat(this)" onkeydown="statKey(event)">'+(vStud||'—')+'</div><div class="l">Student scripts</div></div>'+
+    '<div class="stat"><div class="v editstat" title="Click to edit" contenteditable="true" data-stat="markers" onblur="setStat(this)" onkeydown="statKey(event)">'+(vMk||'—')+'</div><div class="l">Markers on team</div></div>'+
+    '<div class="stat dark"><div class="v editstat" title="Click to set" contenteditable="true" data-stat="hours" onblur="setStat(this)" onkeydown="statKey(event)">'+(vHrs?vHrs+'h':'—')+'</div><div class="l">Allotted marking</div></div>'+
+  '</div>';
+  var f=state.libFilter||'all';
+  var ownCount=state.assessments.filter(function(a){return !isExample(a)}).length;
+  var showFilter=ownCount>=5;
+  var controls='<div class="row" style="margin-bottom:16px">'+
+    '<input type="text" id="libSearch" placeholder="Search assessments…" value="'+esc(state.libQuery||'')+'" oninput="setLibQuery(this.value)">'+
+    (showFilter?'<div class="seg">'+['all','deduction','checklist'].map(function(k){
+      return '<button class="segbtn'+(f===k?' on':'')+'" onclick="setLibFilter(\''+k+'\')">'+k.charAt(0).toUpperCase()+k.slice(1)+'</button>';
+    }).join('')+'</div>':'')+
+  '</div>';
+  el.innerHTML=head+draftRecoveryBanner()+stats+controls+'<div id="libGrid"></div>';
+  renderLibGrid();
+  curLabel();
+}
+function libFiltered(){
+  var q=(state.libQuery||'').toLowerCase(),f=state.libFilter||'all';
+  return state.assessments.filter(function(a){
+    if(!visibleToSession(a))return false;
+    if(f!=='all'&&(a.type||'deduction')!==f)return false;
+    return !q||(a.title||'').toLowerCase().indexOf(q)>=0||(a.question||'').toLowerCase().indexOf(q)>=0;
+  });
+}
+function setLibFilter(f){state.libFilter=f;renderLibrary();var s=document.getElementById('libSearch');if(s&&state.libQuery)s.focus()}
+function setLibQuery(v){state.libQuery=v;renderLibGrid()}
+function toggleExamples(){state.examplesOpen=!state.examplesOpen;renderLibGrid();}
+function renderLibGrid(){
+  var g=document.getElementById('libGrid');if(!g)return;
+  var list=libFiltered();
+  if(!list.length){g.innerHTML='<div class="empty">No assessments match. Clear the search or change the filter.</div>';return;}
+  var examples=list.filter(isExample), mine=list.filter(function(a){return !isExample(a)});
+  var html='';
+  /* Your assessments — the main grid, with the New button in its header */
+  var newBtn=(can('create')&&mine.length)?'<button class="btn gold" id="newAssessmentBtn" onclick="newAssessment()">+ New assessment</button>':'';
+  html+='<div class="lib-sechead" style="align-items:center"><h3>Your assessments</h3><span class="lib-count">'+mine.length+'</span><div style="flex:1"></div>'+newBtn+'</div>';
+  if(mine.length)html+='<div class="cards">'+mine.map(libCardHTML).join('')+'</div>';
+  else html+='<div class="empty" style="margin-top:0;padding:22px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;text-align:center"><div style="line-height:1.4"><b style="color:var(--navy)">No assessments of your own yet.</b><br><span style="font-size:12.5px;color:var(--muted)">Build a rubric once, then mark every student against it.</span></div>'+(can('create')?'<button class="btn gold" id="newAssessmentBtn" onclick="newAssessment()">+ New assessment</button>':'')+'</div>';
+  /* Examples — collapsed clickable box */
+  if(examples.length){
+    var open=!!state.examplesOpen;
+    html+='<div class="ex-box'+(open?' open':'')+'" style="margin-top:22px">'+
+      '<button class="ex-bar" onclick="toggleExamples()">'+
+        '<span class="ex-caret">▸</span>'+
+        '<span class="ex-title">Examples</span>'+
+        '<span class="lib-count">'+examples.length+'</span>'+
+        '<span class="ex-hint">Ready-made rubrics — click to '+(open?'hide':'explore how they were built')+'</span>'+
+      '</button>'+
+      (open?'<div class="cards" style="margin-top:14px">'+examples.map(libCardHTML).join('')+'</div>':'')+
+    '</div>';
+  }
+  g.innerHTML=html;
+}
+function libCardHTML(a){
+    var typeTag=a.type==='checklist'
+      ?('<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);font-weight:600;margin-left:6px">'+(a.scoreMode==='deduct'?'checklist · deduct':'checklist · additive')+'</span>')
+      :('<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:var(--surface);color:var(--faint);font-weight:600;margin-left:6px">deduction</span>');
+    var meta=a.type==='checklist'
+      ?(a.structures.length+' structures · base '+(function(){var t=0;(a.structures||[]).forEach(function(s){t+=parseFloat(s.labelMarks)||parseFloat(s.marks)||0;(s.contents||[]).forEach(function(c){t+=parseFloat(c.marks)||0})});return Math.round(t*100)/100}())+' marks · '+a.markers.length+' markers')
+      :(a.criteria.length+' criteria · '+a.deductionGroups.length+' deduction groups · base '+a.baseScore+' · '+a.markers.length+' markers');
+    var badges=typeTag;
+    if(Array.isArray(a.visibleTo)&&can('access'))badges+='<span class="lockchip" title="Visible only to assigned markers" style="margin-left:6px">Assigned</span>';
+    var canEdit=can('edit',a), canDelete=can('delete')&&!isExample(a);
+    var markLabel=can('mark')?'▶ Open &amp; mark':'▶ Open';
+    var actions='<button class="btn sm primary" onclick="openMark(\''+a.id+'\')">'+markLabel+'</button>';
+    if(isExample(a))actions+='<button class="btn sm" onclick="viewSetup(\''+a.id+'\')" title="See how this example was built (read-only)">👁 View setup</button>';
+    else if(canEdit)actions+='<button class="btn sm" onclick="editAssessment(\''+a.id+'\')">Edit</button>';
+    var menu='<button class="dd-item" onclick="snapshotOne(\''+a.id+'\');closeDD()">📸 Snapshot</button>';
+    if(can('create'))menu+='<button class="dd-item" onclick="dupAssessment(\''+a.id+'\');closeDD()">Duplicate</button>';
+    menu+='<div class="dd-sep"></div>'+
+      '<button class="dd-item" onclick="exportHTML(\''+a.id+'\');closeDD()">Export marking tool (HTML)</button>';
+    if(can('edit',a))menu+='<button class="dd-item" onclick="exportJSON(\''+a.id+'\');closeDD()">Export rubric (JSON)</button>';
+    if(canDelete)menu+='<div class="dd-sep"></div><button class="dd-item danger" onclick="delAssessment(\''+a.id+'\')">Delete</button>';
+    return '<div class="card">'+
+      '<div class="accent" style="background:'+esc(a.accent)+'"></div>'+
+      '<div style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap"><h3 style="flex:1;min-width:60%">'+esc(a.title)+'</h3>'+badges+'</div>'+
+      '<div class="q">'+esc((a.question||'').slice(0,140))+((a.question||'').length>140?'…':'')+'</div>'+
+      '<div class="meta">'+meta+'</div>'+
+      '<div class="card-actions">'+
+        actions+
+        '<div class="spacer"></div>'+
+        '<div class="dd-wrap">'+
+          '<button class="btn sm" onclick="toggleDD(\'dd_'+a.id+'\',event)" title="More options">⋯</button>'+
+          '<div class="dd-menu" id="dd_'+esc(a.id)+'">'+menu+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+}
+
+/* close all dropdowns */
+function closeDD(){document.querySelectorAll('.dd-menu.on').forEach(function(m){m.classList.remove('on')})}
+function toggleDD(id,e){
+  e.stopPropagation();
+  var m=document.getElementById(id);if(!m)return;
+  var wasOn=m.classList.contains('on');
+  closeDD();
+  if(!wasOn)m.classList.add('on');
+}
+document.addEventListener('click',function(){closeDD()});
+var TYPE_PRESETS={
+  video:{
+    label:'Video question',icon:'🎥',
+    desc:'Deduction-based. Marker scores from a base and deducts for errors. Pre-loaded with standard video-assessment rubric.',
+    tag:'deduction · base 30',
+    make:function(){return {id:uid(),title:'New video assessment',question:'',accent:'#1F3864',
+      type:'deduction',scoreMode:'additive',structures:[],baseScore:30,
+      labelSteps:[1,0.75,0.5,0.25,0],contentSteps:[1,0.5,0],
+      criteria:[
+        {title:'Content 1',max:0,model:'',required:[],bonus:[],note:''},
+        {title:'Content 2',max:0,model:'',required:[],bonus:[],note:''}
+      ],
+      deductionGroups:JSON.parse(JSON.stringify(VIDEO_DEFAULTS.deductionGroups)),
+      strengths:JSON.parse(JSON.stringify(VIDEO_DEFAULTS.strengths)),
+      improvements:JSON.parse(JSON.stringify(VIDEO_DEFAULTS.improvements)),
+      openingBands:JSON.parse(JSON.stringify(VIDEO_DEFAULTS.openingBands)),
+      markers:JSON.parse(JSON.stringify(VIDEO_DEFAULTS.markers))};
+    }
+  },
+  labelling:{
+    label:'Labelling / Annotation',icon:'🔬',
+    desc:'Structure checklist. Each structure has a label mark and content items. Marker taps to award or deduct per item.',
+    tag:'checklist · additive',
+    make:function(){return {id:uid(),title:'New labelling assessment',question:'',accent:'#1F3864',
+      type:'checklist',scoreMode:'additive',
+      labelSteps:[1,0.75,0.5,0.25,0],contentSteps:[1,0.5,0],
+      structures:[
+        {name:'Structure 1',labelMarks:1,lostFeedback:'',contents:[{text:'Content item',marks:1,lostFeedback:''}]},
+        {name:'Structure 2',labelMarks:1,lostFeedback:'',contents:[{text:'Content item',marks:1,lostFeedback:''}]}
+      ],
+      criteria:[],
+      deductionGroups:[
+        {name:'Custom deduction',type:'custom',items:[]},
+        {name:'File requirements',type:'checkbox',items:[{label:'Student name not in filename',penalty:1},{label:'Student name not mentioned in assignment',penalty:1}]}
+      ],
+      baseScore:0,
+      strengths:['Accurate identification','Correct contents named','Logical order','Clear annotation'],
+      improvements:['Re-check the label','Re-check the contents','Review the anatomy'],
+      openingBands:[
+        {min:80,max:100,text:'An excellent response with accurate and detailed labelling throughout.'},
+        {min:60,max:79.99,text:'A solid response with most structures correctly identified and labelled.'},
+        {min:40,max:59.99,text:'A partial response — several structures or their contents need revision.'},
+        {min:0,max:39.99,text:'This response needs further development; many structures require review.'}
+      ],
+      markers:[{name:'Vandana',hours:0,students:0},{name:'Andy',hours:0,students:0},{name:'Lucy',hours:0,students:0}]};
+    }
+  }
+};
+function newAssessment(){
+  if(!can('create')){alert('View-only users cannot create assessments.');return;}
+  var modal=document.getElementById('typePickerModal');
+  var cards=document.getElementById('typePickerCards');
+  cards.innerHTML=Object.keys(TYPE_PRESETS).map(function(k){
+    var p=TYPE_PRESETS[k];
+    return '<button class="type-card" onclick="pickType(\''+k+'\')">'+
+      '<span class="tc-icon">'+p.icon+'</span>'+
+      '<div class="tc-title">'+esc(p.label)+'</div>'+
+      '<div class="tc-desc">'+esc(p.desc)+'</div>'+
+      '<span class="tc-tag">'+esc(p.tag)+'</span>'+
+    '</button>';
+  }).join('');
+  modal.classList.add('on');
+}
+function closeTypePicker(){document.getElementById('typePickerModal').classList.remove('on')}
+function pickType(key){
+  closeTypePicker();
+  var preset=TYPE_PRESETS[key];if(!preset)return;
+  state.draft=preset.make();
+  state.editingId=state.draft.id;
+  state.draftReadOnly=false;
+  resetHistory();
+  go('setup');
+}
+function editAssessment(id){var a=find(id);if(!a)return;if(!can('edit',a)){alert(isExample(a)?'This is a protected example. Use “View setup” to see how it was built, or Duplicate it to make an editable copy.':'You do not have permission to edit this assessment.');return;}state.draftReadOnly=false;state.draft=JSON.parse(JSON.stringify(a));state.editingId=id;resetHistory();go('setup')}
+function viewSetup(id){var a=find(id);if(!a)return;state.draftReadOnly=true;state.draft=JSON.parse(JSON.stringify(a));state.editingId=id;resetHistory();go('setup')}
+function dupFromView(){var src=find(state.editingId);if(!src){go('library');return;}var c=JSON.parse(JSON.stringify(src));c.id=uid();c.title=c.title.replace(/ \(example\)$/i,'')+' (copy)';if(Array.isArray(c.visibleTo))c.visibleTo='all';state.assessments.push(c);saveAll();state.draftReadOnly=false;state.draft=JSON.parse(JSON.stringify(c));state.editingId=c.id;resetHistory();go('setup');showToast('Editable copy created');}
+function dupAssessment(id){var c=JSON.parse(JSON.stringify(find(id)));c.id=uid();c.title=c.title+' (copy)';state.assessments.push(c);saveAll();renderLibrary()}
+function delAssessment(id){
+  var a=find(id);if(!a)return;
+  if(isExample(a)){alert('This is a protected example assessment and cannot be deleted.');return;}
+  if(!can('delete')){alert('Only an Admin can delete assessments.');return;}
+  if(!confirm('Delete "'+a.title+'"?\n\nTip: click Cancel and use 📸 Snapshot first to save a backup.'))return;
+  state.assessments=state.assessments.filter(function(x){return x.id!==id});
+  delete state.progress[id];saveAll();saveProg();renderLibrary();
+}
+function openMark(id){state.markingId=id;go('marking')}
+
+/* ============ DRAFT AUTOSAVE / RECOVERY ============ */
+var DRAFT_BK='mtb_draftbackup_v1';
+function draftHasContent(d){
+  if(!d)return false;
+  if((d.title||'').trim())return true;
+  if((d.question||'').trim())return true;
+  if((d.criteria||[]).some(function(c){return (c.model||'').trim()||(c.required||[]).length||(c.bonus||[]).length}))return true;
+  if((d.structures||[]).some(function(s){return (s.contents||[]).length}))return true;
+  return false;
+}
+function autosaveDraft(){
+  if(!state.draft||state.view!=='setup'||state.draftReadOnly)return;
+  if(!draftHasContent(state.draft))return;
+  try{localStorage.setItem(DRAFT_BK,JSON.stringify({
+    draft:state.draft,
+    isNew:!find(state.draft.id),
+    ts:Date.now()
+  }));}catch(e){}
+}
+function readDraftBackup(){try{var r=localStorage.getItem(DRAFT_BK);return r?JSON.parse(r):null}catch(e){return null}}
+function clearDraftBackup(){try{localStorage.removeItem(DRAFT_BK)}catch(e){}}
+function cancelDraft(){
+  if(state.draft&&!find(state.draft.id)&&draftHasContent(state.draft)){
+    if(!confirm('Discard this new assessment?\n\nYour work is auto-saved — you can bring it back from the Library with “Restore unsaved draft”.')){return;}
+  }
+  closeDraft();
+}
+function restoreDraft(){
+  var bk=readDraftBackup();if(!bk||!bk.draft)return;
+  state.draft=bk.draft;
+  state.editingId=bk.draft.id;
+  state.draftReadOnly=false;
+  resetHistory();
+  go('setup');
+}
+function dismissDraftBackup(){clearDraftBackup();renderLibrary();}
+setInterval(autosaveDraft,2500);
+
+/* ============ SETUP / EDIT ============ */
+var undoStack=[], redoStack=[], histLast=null, restoringHistory=false;
+function resetHistory(){undoStack=[];redoStack=[];histLast=state.draft?JSON.stringify(state.draft):null;}
+function captureHistory(){
+  if(restoringHistory||!state.draft)return;
+  var cur=JSON.stringify(state.draft);
+  if(histLast!==null&&histLast!==cur){undoStack.push(histLast);redoStack=[];if(undoStack.length>80)undoStack.shift();}
+  histLast=cur;
+}
+function undoDraft(){
+  if(!state.draft||!undoStack.length){showToast('Nothing to undo');return;}
+  redoStack.push(histLast);
+  var prev=undoStack.pop();
+  restoringHistory=true;
+  state.draft=JSON.parse(prev);state.editingId=state.draft.id;histLast=prev;
+  renderSetup();
+  restoringHistory=false;
+  showToast('↩ Undone');
+}
+function redoDraft(){
+  if(!state.draft||!redoStack.length){showToast('Nothing to redo');return;}
+  undoStack.push(histLast);
+  var nxt=redoStack.pop();
+  restoringHistory=true;
+  state.draft=JSON.parse(nxt);state.editingId=state.draft.id;histLast=nxt;
+  renderSetup();
+  restoringHistory=false;
+  showToast('↪ Redone');
+}
+document.addEventListener('keydown',function(e){
+  if(state.view!=='setup'||!state.draft)return;
+  var t=e.target,tag=(t&&t.tagName||'').toLowerCase();
+  var inField=(tag==='input'||tag==='textarea'||tag==='select'||(t&&t.isContentEditable));
+  if(inField)return; /* let the browser handle native text undo inside fields */
+  var mod=e.ctrlKey||e.metaKey;
+  if(mod&&(e.key==='z'||e.key==='Z')){e.preventDefault();if(e.shiftKey)redoDraft();else undoDraft();}
+  else if(mod&&(e.key==='y'||e.key==='Y')){e.preventDefault();redoDraft();}
+});
+function renderSetup(){
+  captureHistory();
+  var el=document.getElementById('view-setup');
+  if(!state.draft){el.innerHTML='<div class="empty">Nothing to edit. Go to the Library and choose <b>Edit</b> or <b>New assessment</b>.</div>';curLabel();return}
+  var d=state.draft;
+  var ro=!!state.draftReadOnly;
+  var isCk=d.type==='checklist';
+  var bands=d.openingBands.map(function(b,i){return bandForm(b,i)}).join('');
+  var mk=d.markers.map(function(m,i){return markerForm(m,i)}).join('');
+
+  var basics='<div class="panel" id="pBasics"><h3>Basics</h3>'+
+    '<div class="fg"><label class="fl">Assessment title</label><input type="text" value="'+esc(d.title)+'" oninput="d().title=this.value;curLabel()"></div>'+
+    '<div class="fg"><label class="fl">Question / prompt</label><textarea oninput="d().question=this.value">'+esc(d.question)+'</textarea></div>'+
+    '<div class="grid2"><div class="fg"><label class="fl">Assessment type</label><select onchange="setType(this.value)">'+
+      '<option value="deduction"'+(!isCk?' selected':'')+'>Deduction-based (one holistic response, marks taken off)</option>'+
+      '<option value="checklist"'+(isCk?' selected':'')+'>Structure checklist (labelling / annotation — per-structure marks)</option></select></div>'+
+    '<div class="fg"><label class="fl">Accent colour</label><div class="colorrow"><input type="color" value="'+esc(d.accent)+'" oninput="d().accent=this.value"><span class="muted">themes the generated tool</span></div></div></div>'+
+    (isCk
+      ?'<div class="fg" style="margin-top:4px"><label class="fl">Scoring mode</label><select onchange="d().scoreMode=this.value;renderSetup()">'+
+         '<option value="additive"'+(d.scoreMode==='additive'?' selected':'')+'>Additive — start at 0, award marks per structure</option>'+
+         '<option value="deduct"'+(d.scoreMode==='deduct'?' selected':'')+'>Deduct from total — start at full, take marks off errors</option></select>'+
+         '<div class="typenote" style="margin-top:8px">'+(d.scoreMode==='additive'
+            ?'<b>Additive.</b> Every structure begins unmarked (0). The marker taps each one to award full or partial credit. The score builds up. Best when you check every structure deliberately.'
+            :'<b>Deduct from total.</b> Every structure begins assumed correct (full marks). The marker only flags the ones that are wrong or partial. Faster when most labels are right.')+'</div></div>'
+      :'<div class="fg" style="margin-top:4px"><label class="fl">Base score (deductions subtract from this)</label><input type="number" value="'+d.baseScore+'" oninput="d().baseScore=parseFloat(this.value)||0"></div>')+
+    '</div>';
+
+  var middle;
+  if(isCk){
+    var lStepsVal=(d.labelSteps||[1,0.75,0.5,0.25,0]).join(', ');
+    var cStepsVal=(d.contentSteps||[1,0.5,0]).join(', ');
+    var ckDed=(d.deductionGroups||[]).map(function(g,i){return dedForm(g,i)}).join('');
+    var structs=(d.structures||[]).map(function(s,i){return structForm(s,i)}).join('');
+    middle='<div class="panel" id="pStructures"><h3>Structures to label</h3>'+
+      '<div class="grid2" style="margin-bottom:14px">'+
+        '<div class="fg"><label class="fl">Label partial-credit steps (fractions, comma-separated)</label>'+
+          '<input type="text" value="'+esc(lStepsVal)+'" oninput="setLabelSteps(this.value)" placeholder="e.g. 1, 0.75, 0.5, 0.25, 0">'+
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px">Applied to the structure label. Button will show actual marks at each step.</div></div>'+
+        '<div class="fg"><label class="fl">Content item steps (fractions, comma-separated)</label>'+
+          '<input type="text" value="'+esc(cStepsVal)+'" oninput="setContentSteps(this.value)" placeholder="e.g. 1, 0.5, 0">'+
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px">Applied independently to each content item.</div></div>'+
+      '</div>'+
+      '<div id="structList">'+structs+'</div>'+
+      '<button class="btn sm addline" onclick="addStructure()">+ Add structure</button>'+
+      '</div>'+
+      '<div class="panel" id="pDeductions"><h3>Deduction groups</h3>'+
+      '<div class="muted" style="font-size:12px;margin-bottom:12px">Optional — applied on top of the structure scoring. Useful for file requirements, custom penalties, or anything that falls outside the per-structure marks.</div>'+
+      '<div id="dedList">'+ckDed+'</div>'+
+      '<div class="row" style="gap:6px;margin-top:4px">'+
+        '<button class="btn sm addline" onclick="addDed(\'radio\')">+ Radio group</button>'+
+        '<button class="btn sm addline" onclick="addDed(\'checkbox\')">+ Checkbox group</button>'+
+        '<button class="btn sm addline" onclick="addDed(\'custom\')">+ Custom (free-text)</button>'+
+      '</div>';
+  }else{
+    var crit=d.criteria.map(function(c,i){return critForm(c,i)}).join('');
+    var ded=d.deductionGroups.map(function(g,i){return dedForm(g,i)}).join('');
+    middle='<div class="panel" id="pAnswerKey"><h3>Answer key — criteria</h3><div id="critList">'+crit+'</div>'+
+      '<button class="btn sm addline" onclick="addCrit()">+ Add criterion</button></div>'+
+      '<div class="panel" id="pDeductions"><h3>Deduction groups</h3><div id="dedList">'+ded+'</div>'+
+      '<div class="row" style="gap:6px;margin-top:4px">'+
+        '<button class="btn sm addline" onclick="addDed(\'radio\')">+ Radio group</button>'+
+        '<button class="btn sm addline" onclick="addDed(\'checkbox\')">+ Checkbox group</button>'+
+        '<button class="btn sm addline" onclick="addDed(\'custom\')">+ Custom (free-text)</button>'+
+      '</div></div>';
+  }
+
+  el.innerHTML=
+    (ro?'<div class="recover-bar" style="background:#EDF1F7;border-color:#C6D4E8"><span class="rec-ic" style="background:var(--navy);color:var(--gold)">🔒</span><div style="flex:1"><b style="color:#1E3A5F">Protected example — read-only</b><span style="color:#4A6285">You\'re viewing how this example was built. Fields can\'t be changed. Use <b>Duplicate to edit</b> to make your own editable copy.</span></div>'+(can('create')?'<button class="btn gold" onclick="dupFromView()">Duplicate to edit</button>':'')+'</div>':'')+
+    '<div class="row"><h2 class="sec">'+(ro?'Example rubric':(state.assessments.some(function(a){return a.id===d.id})?'Edit assessment':'New assessment'))+'</h2><div class="spacer"></div>'+
+      '<button class="btn" id="tourPreviewBtn" onclick="previewDraft()">👁 Preview</button> '+
+      (ro?'<button class="btn" onclick="closeDraft()">Close</button>':'<button class="btn primary" onclick="saveDraft()">Save</button>')+'</div>'+
+    '<div class="sub">'+(ro?'A read-only view of this example\'s rubric — exactly what the generated marking tool shows. Duplicate it to make an editable copy.':'Fill in the rubric. Everything here is what the generated marking tool will show.')+'</div>'+
+    basics+middle+
+    '<div class="panel" id="pFeedback"><h3>Feedback banks</h3>'+
+      '<div class="grid2"><div><label class="fl">Strengths (one per line)</label><textarea style="min-height:120px" oninput="d().strengths=lines(this.value)">'+esc(d.strengths.join('\n'))+'</textarea></div>'+
+      '<div><label class="fl">Areas for improvement — each applies −1 (one per line)</label><textarea style="min-height:120px" oninput="d().improvements=lines(this.value)">'+esc(d.improvements.join('\n'))+'</textarea></div></div></div>'+
+    '<div class="panel" id="pBands"><h3>Score-banded opening statements</h3><div id="bandList">'+bands+'</div>'+
+      '<button class="btn sm addline" onclick="addBand()">+ Add band</button></div>'+
+    '<div class="panel" id="pMarkers"><h3>Markers, allotted hours &amp; student totals</h3><div id="mkList">'+mk+'</div>'+
+      '<button class="btn sm addline" onclick="addMarker()">+ Add marker</button></div>'+
+    '<div class="row"><div class="spacer"></div><button class="btn" onclick="'+(ro?'closeDraft()':'cancelDraft()')+'">'+(ro?'Close':'Cancel')+'</button> <button class="btn" onclick="previewDraft()">👁 Preview</button>'+(ro?(can('create')?' <button class="btn gold" onclick="dupFromView()">Duplicate to edit</button>':''):' <button class="btn primary" onclick="saveDraft()">Save assessment</button>')+'</div>';
+  if(ro)setTimeout(applyReadOnlySetup,0);
+  curLabel();
+}
+function applyReadOnlySetup(){
+  var el=document.getElementById('view-setup');if(!el)return;
+  el.querySelectorAll('input,textarea,select').forEach(function(c){c.disabled=true;c.style.cursor='default';});
+  el.querySelectorAll('.addline,.x,.chip-tag .x').forEach(function(b){b.style.display='none';});
+  el.querySelectorAll('button[onclick]').forEach(function(b){
+    var oc=b.getAttribute('onclick')||'';
+    if(/^(add|rm|set(Type|LabelSteps|ContentSteps)|toggle)/.test(oc)||oc.indexOf('addline')>=0){b.style.display='none';}
+  });
+}
+function setType(t){
+  var d=state.draft;d.type=t;
+  if(t==='checklist'&&(!d.structures||!d.structures.length))d.structures=[{name:'Structure 1',labelMarks:1,lostFeedback:'',contents:[]}];
+  if(!d.labelSteps)d.labelSteps=[1,0.75,0.5,0.25,0];
+  if(!d.contentSteps)d.contentSteps=[1,0.5,0];
+  if(t==='deduction'&&(!d.criteria||!d.criteria.length))d.criteria=[{title:'Criterion 1',max:0,model:'',required:[],bonus:[],note:''}];
+  renderSetup();
+}
+function setLabelSteps(v){
+  var parts=v.split(',').map(function(x){return parseFloat(x.trim())}).filter(function(n){return!isNaN(n)});
+  if(parts.length)d().labelSteps=parts;
+}
+function setContentSteps(v){
+  var parts=v.split(',').map(function(x){return parseFloat(x.trim())}).filter(function(n){return!isNaN(n)});
+  if(parts.length)d().contentSteps=parts;
+}
+function addContent(si){
+  if(!d().structures[si].contents)d().structures[si].contents=[];
+  d().structures[si].contents.push({text:'',marks:1,lostFeedback:''});renderSetup();
+}
+function rmContent(si,ci){var c=d().structures[si].contents[ci];if(c&&(c.text||'').trim()&&!confirm('Remove this content line?\n\n“'+c.text.slice(0,60)+'”'))return;d().structures[si].contents.splice(ci,1);renderSetup()}
+function structForm(s,i){
+  var lm=s.labelMarks!=null?s.labelMarks:(s.marks||1);
+  var contents=(s.contents||[]).map(function(c,j){
+    return '<div class="subcard" style="background:#fff;margin:6px 0 0">'+
+      '<div class="row" style="margin-bottom:6px">'+
+        '<input type="text" value="'+esc(c.text||'')+'" oninput="d().structures['+i+'].contents['+j+'].text=this.value" placeholder="Content item e.g. CN II (optic nerve)" style="flex:2">'+
+        '<input type="number" step="0.25" value="'+c.marks+'" oninput="d().structures['+i+'].contents['+j+'].marks=parseFloat(this.value)||0" style="width:80px" placeholder="Marks">'+
+        '<button class="x" onclick="rmContent('+i+','+j+')">×</button>'+
+      '</div>'+
+      '<div><label class="fl">Feedback if lost</label><input type="text" value="'+esc(c.lostFeedback||'')+'" oninput="d().structures['+i+'].contents['+j+'].lostFeedback=this.value" placeholder="e.g. CN II / optic nerve not named."></div>'+
+    '</div>';
+  }).join('');
+  return '<div class="subcard">'+
+    '<div class="hd">'+
+      '<input type="text" value="'+esc(s.name||'')+'" oninput="d().structures['+i+'].name=this.value" placeholder="Structure name e.g. Optic canal">'+
+      '<button class="x" onclick="rmStructure('+i+')">×</button>'+
+    '</div>'+
+    '<div class="grid2" style="margin-bottom:8px">'+
+      '<div><label class="fl">Label marks</label><input type="number" step="0.25" value="'+lm+'" oninput="d().structures['+i+'].labelMarks=parseFloat(this.value)||0"></div>'+
+      '<div><label class="fl">Feedback if label lost</label><input type="text" value="'+esc(s.lostFeedback||'')+'" oninput="d().structures['+i+'].lostFeedback=this.value" placeholder="e.g. Optic canal not identified."></div>'+
+    '</div>'+
+    '<label class="fl">Content items</label>'+
+    contents+
+    '<button class="btn sm addline" style="margin-top:8px" onclick="addContent('+i+')">+ Add content item</button>'+
+  '</div>';
+}
+function addStructure(){d().structures.push({name:'',labelMarks:1,lostFeedback:'',contents:[]});renderSetup()}
+function rmStructure(i){
+  var name=(d().structures[i]&&d().structures[i].name)||'this structure';
+  if(!confirm('Remove "'+name+'"?\n\nTip: use 📸 Snapshot on the Library page to save a backup first.'))return;
+  d().structures.splice(i,1);renderSetup();
+}
+function d(){return state.draft}
+function lines(v){return v.split('\n').map(function(s){return s.trim()}).filter(Boolean)}
+
+function critForm(c,i){
+  var req=(c.required||[]).map(function(t,j){return tagLine('required',i,j,t,'req')}).join('');
+  var bon=(c.bonus||[]).map(function(t,j){return tagLine('bonus',i,j,t,'bon')}).join('');
+  return '<div class="subcard"><div class="hd"><input type="text" value="'+esc(c.title)+'" oninput="d().criteria['+i+'].title=this.value" placeholder="Criterion title"><button class="x" onclick="rmCrit('+i+')">×</button></div>'+
+    '<div class="fg"><label class="fl">Model answer</label><textarea oninput="d().criteria['+i+'].model=this.value">'+esc(c.model)+'</textarea></div>'+
+    '<div class="fg"><label class="fl">Required elements <span class="chip-tag req">green</span></label>'+req+'<button class="btn sm addline" onclick="addTag(\'required\','+i+')">+ required</button></div>'+
+    '<div class="fg"><label class="fl">Bonus elements <span class="chip-tag bon">amber</span></label>'+bon+'<button class="btn sm addline" onclick="addTag(\'bonus\','+i+')">+ bonus</button></div>'+
+    '<div class="fg"><label class="fl">Marking note (private to markers)</label><input type="text" value="'+esc(c.note)+'" oninput="d().criteria['+i+'].note=this.value"></div></div>';
+}
+function tagLine(kind,i,j,t,cls){
+  return '<div class="tagline"><span class="chip-tag '+cls+'">'+(cls==='req'?'req':'bonus')+'</span><input type="text" value="'+esc(t)+'" oninput="d().criteria['+i+'].'+kind+'['+j+']=this.value"><button class="x" onclick="rmTag(\''+kind+'\','+i+','+j+')">×</button></div>';
+}
+function addCrit(){d().criteria.push({title:'New criterion',max:0,model:'',required:[],bonus:[],note:''});renderSetup()}
+function rmCrit(i){
+  var name=(d().criteria[i]&&d().criteria[i].title)||'this criterion';
+  if(!confirm('Remove "'+name+'"?\n\nTip: use 📸 Snapshot on the Library page to save a backup first.'))return;
+  d().criteria.splice(i,1);renderSetup();
+}
+function addTag(kind,i){d().criteria[i][kind].push('');renderSetup()}
+function rmTag(kind,i,j){var t=(d().criteria[i][kind]||[])[j];if(t&&t.trim()&&!confirm('Remove this point?\n\n“'+t.slice(0,60)+'”'))return;d().criteria[i][kind].splice(j,1);renderSetup()}
+
+function dedForm(g,i){
+  if(g.type==='custom'){
+    return '<div class="subcard"><div class="hd"><input type="text" value="'+esc(g.name)+'" oninput="d().deductionGroups['+i+'].name=this.value"><span class="pill">free-text + penalty</span><button class="x" onclick="rmDed('+i+')">×</button></div><div class="muted" style="font-size:12px">In the marking view this shows a free-text reason and a penalty amount the marker types in.</div></div>';
+  }
+  var items=g.items.map(function(it,j){return '<div class="ded-item"><input type="text" value="'+esc(it.label)+'" oninput="d().deductionGroups['+i+'].items['+j+'].label=this.value"><input type="number" value="'+it.penalty+'" oninput="d().deductionGroups['+i+'].items['+j+'].penalty=parseFloat(this.value)||0"><button class="x" onclick="rmDedItem('+i+','+j+')">×</button></div>'}).join('');
+  return '<div class="subcard"><div class="hd"><input type="text" value="'+esc(g.name)+'" oninput="d().deductionGroups['+i+'].name=this.value">'+
+    '<select onchange="d().deductionGroups['+i+'].type=this.value;renderSetup()" style="width:130px">'+
+      '<option value="radio"'+(g.type==='radio'?' selected':'')+'>radio (pick one)</option>'+
+      '<option value="checkbox"'+(g.type==='checkbox'?' selected':'')+'>checkbox (tick any)</option>'+
+    '</select><button class="x" onclick="rmDed('+i+')">×</button></div>'+
+    '<div class="typenote">'+(g.type==='radio'
+      ?'<b>Radio — pick one.</b> The marker can choose only one option here; selecting another clears the first. Use for mutually exclusive severities (e.g. minor vs major error).'
+      :'<b>Checkbox — tick any.</b> The marker can tick none, one, or several and the penalties add up. Use for independent faults that can co-occur (e.g. unclear delivery and reading from notes).')+'</div>'+
+    '<div class="ded-item" style="font-size:11px;color:var(--faint);font-weight:600"><div>REASON</div><div>PENALTY</div><div></div></div>'+
+    items+'<button class="btn sm addline" onclick="addDedItem('+i+')">+ option</button></div>';
+}
+function addDed(t){d().deductionGroups.push({name:'New deduction group',type:t||'radio',items:t==='custom'?[]:[{label:'',penalty:1}]});renderSetup()}
+function rmDed(i){
+  var name=(d().deductionGroups[i]&&d().deductionGroups[i].name)||'this group';
+  if(!confirm('Remove "'+name+'"?'))return;
+  d().deductionGroups.splice(i,1);renderSetup();
+}
+function addDedItem(i){d().deductionGroups[i].items.push({label:'',penalty:1});renderSetup()}
+function rmDedItem(i,j){var it=d().deductionGroups[i].items[j];if(it&&(it.label||'').trim()&&!confirm('Remove this deduction option?\n\n“'+it.label.slice(0,60)+'”'))return;d().deductionGroups[i].items.splice(j,1);renderSetup()}
+
+function bandForm(b,i){
+  return '<div class="subcard"><div class="grid3"><div><label class="fl">Min</label><input type="number" value="'+b.min+'" oninput="d().openingBands['+i+'].min=parseFloat(this.value)||0"></div>'+
+    '<div><label class="fl">Max</label><input type="number" value="'+b.max+'" oninput="d().openingBands['+i+'].max=parseFloat(this.value)||0"></div>'+
+    '<div style="display:flex;align-items:flex-end"><button class="x" onclick="rmBand('+i+')">×</button></div></div>'+
+    '<div class="fg" style="margin-top:8px"><label class="fl">Opening statement</label><textarea oninput="d().openingBands['+i+'].text=this.value">'+esc(b.text)+'</textarea></div></div>';
+}
+function addBand(){d().openingBands.push({min:0,max:0,text:''});renderSetup()}
+function rmBand(i){var b=d().openingBands[i];if(b&&(b.text||'').trim()&&!confirm('Remove this score band?\n\n“'+b.text.slice(0,60)+'”'))return;d().openingBands.splice(i,1);renderSetup()}
+
+function markerForm(m,i){
+  return '<div class="mk-row"><input type="text" value="'+esc(m.name)+'" oninput="d().markers['+i+'].name=this.value" placeholder="Name">'+
+    '<input type="number" value="'+m.hours+'" oninput="d().markers['+i+'].hours=parseFloat(this.value)||0" placeholder="Allotted hours">'+
+    '<input type="number" value="'+m.students+'" oninput="d().markers['+i+'].students=parseInt(this.value)||0" placeholder="Total students">'+
+    '<button class="x" onclick="rmMarker('+i+')">×</button></div>';
+}
+function addMarker(){d().markers.push({name:'',hours:0,students:0});renderSetup()}
+function rmMarker(i){var m=d().markers[i];if(m&&(m.name||'').trim()&&!confirm('Remove marker “'+m.name+'”?'))return;d().markers.splice(i,1);renderSetup()}
+
+function draftValidation(d){
+  if(!d.type)return 'Choose an assessment type first.';
+  if(!d.title||!d.title.trim())return 'Give the assessment a title.';
+  return '';
+}
+function previewDraft(){
+  var d=state.draft;if(!d)return;
+  var err=draftValidation(d);
+  if(err){showToast('⚠ '+err);return;}
+  var copy=JSON.parse(JSON.stringify(d));
+  window.__previewProg={};
+  document.getElementById('previewTitle').textContent=copy.title||'Marking tool preview';
+  var body=document.getElementById('previewBody');
+  body.innerHTML=runtimeMarkup(copy,window.__previewProg,false);
+  document.getElementById('previewModal').classList.add('on');
+  setTimeout(function(){wireRuntime(copy,window.__previewProg,false);},0);
+}
+function closePreview(){
+  document.getElementById('previewModal').classList.remove('on');
+  // re-wire the real marking view if one is open, so RT globals aren't left pointing at the preview copy
+  if(state.view==='marking'&&state.markingId){var a=find(state.markingId);if(a)wireRuntime(a,prog(a.id),false);}
+}
+function saveFromPreview(){
+  document.getElementById('previewModal').classList.remove('on');
+  saveDraft();
+}
+
+function closeDraft(){state.draft=null;state.draftReadOnly=false;state.editingId=null;go('library');}
+function saveDraft(){
+  var d=state.draft;if(!d)return;
+  var ix=state.assessments.findIndex(function(a){return a.id===d.id});
+  if(ix>=0)state.assessments[ix]=JSON.parse(JSON.stringify(d));
+  else state.assessments.push(JSON.parse(JSON.stringify(d)));
+  saveAll();
+  clearDraftBackup();
+  state.draft=null;state.draftReadOnly=false;state.editingId=null;
+  go('library');
+}
+
+/* ============ MARKING (live preview = generated tool) ============ */
+function renderMarking(){
+  var el=document.getElementById('view-marking');
+  var a=state.markingId?find(state.markingId):null;
+  if(!a){el.innerHTML='<div class="empty">No assessment open. Pick one in the Library with <b>Open &amp; mark</b>.</div>';curLabel();return}
+  var p=prog(a.id);
+  el.innerHTML=runtimeMarkup(a,p,false);
+  setTimeout(function(){wireRuntime(a,p,false)},0);
+  curLabel();
+}
+
+/* Shared marking markup used both for live preview and for the exported file.
+   `standalone` flag only changes nothing visually; logic is identical. */
+function runtimeMarkup(a,p,standalone){
+  var ac=a.accent;
+  var crit=a.criteria.map(function(c,i){
+    var tags=(c.required||[]).map(function(t){return '<span class="chip-tag req">'+esc(t)+'</span>'}).join('')+
+             (c.bonus||[]).map(function(t){return '<span class="chip-tag bon">'+esc(t)+'</span>'}).join('');
+    return '<div class="crit" id="crit'+i+'"><div class="ch" onclick="toggleCrit('+i+')">▸ '+esc(c.title)+'</div>'+
+      '<div class="key">'+(c.model?'<div class="model">'+esc(c.model)+'</div>':'')+
+      (tags?'<div class="tags">'+tags+'</div>':'')+
+      (c.note?'<div class="note">'+esc(c.note)+'</div>':'')+'</div></div>';
+  }).join('');
+  if(!p.hiddenGroups)p.hiddenGroups={};
+  var _presRe=/present|video|timing|file|format|delivery|audio|length|filename/i;
+  var _dContent='',_dPres='';
+  a.deductionGroups.forEach(function(g,i){
+    if(p.hiddenGroups[i])return; /* hidden for this session */
+    var _html=(function(g,i){
+    var rmBtn='<button class="x" style="margin-left:auto" title="Remove group" onclick="hideGroup('+i+')">×</button>';
+    if(g.type==='custom'){
+      return '<div class="dgroup"><div style="display:flex;align-items:center;margin-bottom:6px">'+
+        '<input class="gn-input" style="margin-bottom:0;flex:1" value="'+esc(g.name)+'" oninput="RT.a.deductionGroups['+i+'].name=this.value">'+
+        rmBtn+'</div>'+
+        '<div class="row"><input type="text" id="customlbl'+i+'" placeholder="Reason" oninput="recompute()"><input type="number" id="custompen'+i+'" placeholder="−" style="width:90px" oninput="recompute()"></div></div>';
+    }
+    var opts=g.items.map(function(it,j){
+      var inp=g.type==='radio'
+        ?'<input type="radio" name="ded'+i+'" value="'+it.penalty+'" onchange="recompute()">'
+        :'<input type="checkbox" value="'+it.penalty+'" data-g="'+i+'" onchange="recompute()">';
+      return '<label class="dopt">'+inp+'<span>'+esc(it.label)+'</span><span class="pen">−'+it.penalty+'</span></label>';
+    }).join('');
+    var clr=(g.type==='radio')?'<button class="btn sm addline" onclick="clearRadio('+i+')">clear</button>':'';
+    return '<div class="dgroup"><div style="display:flex;align-items:center;margin-bottom:6px">'+
+      '<input class="gn-input" style="margin-bottom:0;flex:1" value="'+esc(g.name)+'" oninput="RT.a.deductionGroups['+i+'].name=this.value">'+
+      rmBtn+'</div>'+opts+
+      '<div id="grpext'+i+'"></div>'+
+      clr+' <button class="btn sm addline" onclick="addGroupOpt('+i+')">+ option</button></div>';
+    })(g,i);
+    if(_presRe.test(g.name))_dPres+=_html;else _dContent+=_html;
+  });
+  var ded=_dContent+(_dPres?'<details class="ded-fold"><summary>Presentation, video &amp; file requirements</summary><div style="padding-top:10px">'+_dPres+'</div></details>':'');
+  var strengths=a.strengths.map(function(s,i){return '<span class="fchip" id="str'+i+'">'+esc(s)+'</span>'}).join('');
+  var improvements=a.improvements.map(function(s,i){return '<span class="fchip imp" id="imp'+i+'">'+esc(s)+'</span>'}).join('');
+  var sectionComments=(a.type==='checklist')?'':a.criteria.map(function(c,i){return '<div class="fg"><label class="fl">'+esc(c.title)+' — comment</label><textarea id="sc'+i+'" oninput="buildFeedback()" placeholder="Optional comment fed into student feedback"></textarea></div>'}).join('');
+  var hours=a.markers.map(function(m,i){return htrackerMarkup(m,i,p)}).join('');
+
+  var isCk=a.type==='checklist';
+  var total=0;
+  if(isCk){
+    (a.structures||[]).forEach(function(s){
+      total+=parseFloat(s.labelMarks)||parseFloat(s.marks)||0;
+      (s.contents||[]).forEach(function(c){total+=parseFloat(c.marks)||0});
+    });
+  }
+
+  var markBody,barLabel,scoreStrip;
+  if(isCk){
+    barLabel='Structures';
+    /* initialise p.structs in new format: {label: stepIndex, contents: [stepIndex,...]} */
+    var lSteps=a.labelSteps&&a.labelSteps.length?a.labelSteps:[1,0.5,0];
+    var cSteps=a.contentSteps&&a.contentSteps.length?a.contentSteps:[1,0];
+    var cycle0L=a.scoreMode==='deduct'?0:lSteps.length-1; /* deduct starts at full (idx0); additive starts at 0 (last idx) */
+    var cycle0C=a.scoreMode==='deduct'?0:cSteps.length-1;
+    if(!p.structs)p.structs=[];
+    p.structs=a.structures.map(function(s,i){
+      var ex=p.structs[i]||{};
+      var nContents=(s.contents||[]).length;
+      var ci=Array.isArray(ex.ci)?ex.ci:[];
+      while(ci.length<nContents)ci.push(cycle0C);
+      return {li:(ex.li!=null?ex.li:cycle0L),ci:ci.slice(0,nContents)};
+    });
+
+    function stepClass(frac){return frac>=1?'correct':frac>0?'partial':'incorrect'}
+    function labelForStep(marks,frac){
+      var v=Math.round(marks*frac*100)/100;
+      return v+'';
+    }
+
+    markBody=(a.structures||[]).map(function(s,i){
+      var lm=parseFloat(s.labelMarks)||parseFloat(s.marks)||0;
+      var st=p.structs[i];
+      var lFrac=lSteps[st.li!=null?st.li:0];
+      var lClass=stepClass(lFrac);
+      var lLabel=labelForStep(lm,lFrac);
+      /* label row */
+      var html='<div class="struct-row" style="background:var(--surface);border-radius:8px 8px 0 0;padding:9px 12px;margin-bottom:0;border-bottom:none">'+
+        '<div class="sname">'+esc(s.name)+'</div>'+
+        '<div class="smark">'+lm+(lm===1?' mk':' mks')+' (label)</div>'+
+        '<button class="sbtn '+lClass+'" id="sb'+i+'_l" onclick="cycleItem('+i+',\'l\')">'+lLabel+'</button></div>';
+      /* content rows */
+      (s.contents||[]).forEach(function(ct,j){
+        var cm=parseFloat(ct.marks)||0;
+        var cFrac=cSteps[st.ci[j]!=null?st.ci[j]:0];
+        var cClass=stepClass(cFrac);
+        var cLabel=labelForStep(cm,cFrac);
+        var isLast=j===s.contents.length-1;
+        html+='<div class="struct-row" style="padding:7px 12px 7px 28px;background:#fff;'+(isLast?'border-radius:0 0 8px 8px;margin-bottom:10px':'')+'">'+
+          '<div style="font-size:12px;color:var(--muted)">'+esc(ct.text)+'</div>'+
+          '<div class="smark">'+cm+(cm===1?' mk':' mks')+'</div>'+
+          '<button class="sbtn '+cClass+'" id="sb'+i+'_c'+j+'" onclick="cycleItem('+i+',\'c\','+j+')">'+cLabel+'</button></div>';
+      });
+      if(!(s.contents&&s.contents.length))html=html.replace('border-radius:8px 8px 0 0','border-radius:8px').replace('border-bottom:none','')+'';
+      return '<div style="margin-bottom:10px">'+html+'</div>';
+    }).join('');
+    scoreStrip=(a.scoreMode==='deduct')
+      ?'<div class="score-strip"><div class="blk"><span class="v" id="vBase">'+total+'</span><span class="l">Total</span></div>'+
+        '<div class="blk"><span class="v" id="vDed">0</span><span class="l">Deductions</span></div>'+
+        '<div class="blk final"><span class="v" id="vFinal">'+total+'</span><span class="l">Final / '+total+'</span></div></div>'
+      :'<div class="score-strip"><div class="blk"><span class="v" id="vBase">'+total+'</span><span class="l">Total marks</span></div>'+
+        '<div class="blk final"><span class="v" id="vFinal">0</span><span class="l">Awarded / '+total+'</span></div></div>';
+  }else{
+    barLabel='Answer key &amp; deductions';
+    markBody=crit+'<div style="height:8px"></div>'+ded+
+      '<div id="extraDedList"></div>'+
+      '<div class="row" style="gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">'+
+        '<button class="btn sm addline" onclick="addExtraDed(\'checkbox\')">+ Add deduction group</button>'+
+        '<div id="restoreBtn" style="margin-left:auto"></div>'+
+      '</div>';
+    scoreStrip='<div class="score-strip"><div class="blk"><span class="v" id="vBase">'+a.baseScore+'</span><span class="l">Base</span></div>'+
+      '<div class="blk"><span class="v" id="vDed">0</span><span class="l">Deductions</span></div>'+
+      '<div class="blk final"><span class="v" id="vFinal">'+a.baseScore+'</span><span class="l">Final / '+a.baseScore+'</span></div></div>';
+  }
+
+  /* checklist also gets deduction groups if any defined */
+  var ckDedSection='';
+  if(isCk&&a.deductionGroups&&a.deductionGroups.length){
+    if(!p.hiddenGroups)p.hiddenGroups={};
+    var ckDedHtml=a.deductionGroups.map(function(g,i){
+      if(p.hiddenGroups['ck'+i])return '';
+      var rmBtn='<button class="x" style="margin-left:auto" title="Remove group" onclick="hideCkGroup('+i+')">×</button>';
+      if(g.type==='custom'){
+        return '<div class="dgroup"><div style="display:flex;align-items:center;margin-bottom:6px">'+
+          '<input class="gn-input" style="margin-bottom:0;flex:1" value="'+esc(g.name)+'" oninput="RT.a.deductionGroups['+i+'].name=this.value">'+
+          rmBtn+'</div>'+
+          '<div class="row"><input type="text" id="customlbl_ck'+i+'" placeholder="Reason" oninput="recompute()"><input type="number" id="custompen_ck'+i+'" placeholder="−" style="width:90px" oninput="recompute()"></div></div>';
+      }
+      var opts=g.items.map(function(it,j){
+        var inp=g.type==='radio'
+          ?'<input type="radio" name="ckded'+i+'" value="'+it.penalty+'" onchange="recompute()">'
+          :'<input type="checkbox" value="'+it.penalty+'" data-ckg="'+i+'" onchange="recompute()">';
+        return '<label class="dopt">'+inp+'<span>'+esc(it.label)+'</span><span class="pen">−'+it.penalty+'</span></label>';
+      }).join('');
+      var clr=(g.type==='radio')?'<button class="btn sm addline" onclick="clearCkRadio('+i+')">clear</button>':'';
+      return '<div class="dgroup"><div style="display:flex;align-items:center;margin-bottom:6px">'+
+        '<input class="gn-input" style="margin-bottom:0;flex:1" value="'+esc(g.name)+'" oninput="RT.a.deductionGroups['+i+'].name=this.value">'+
+        rmBtn+'</div>'+opts+
+        '<div id="grpext_ck'+i+'"></div>'+
+        clr+' <button class="btn sm addline" onclick="addCkGroupOpt('+i+')">+ option</button></div>';
+    }).join('');
+    ckDedSection='<div class="mk-card"><div class="bar bar-accent">Deductions</div><div class="body">'+
+      ckDedHtml+
+      '<div id="extraDedList"></div>'+
+      '<div class="row" style="gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">'+
+        '<button class="btn sm addline" onclick="addExtraDed(\'checkbox\')">+ Add deduction group</button>'+
+        '<div id="restoreBtn" style="margin-left:auto"></div>'+
+      '</div>'+
+    '</div></div>';
+  }else if(isCk){
+    ckDedSection='<div class="mk-card"><div class="bar bar-accent">Deductions</div><div class="body">'+
+      '<div id="extraDedList"></div>'+
+      '<div class="row" style="gap:6px">'+
+        '<button class="btn sm addline" onclick="addExtraDed(\'checkbox\')">+ Add deduction group</button>'+
+      '</div>'+
+    '</div></div>';
+  }
+
+  return ''+
+  '<style id="rt-accent">.bar-accent{background:'+ac+'} .score-strip{background:'+ac+'} .progbar i{background:'+ac+'} .crit.open>.ch{color:'+ac+'}</style>'+
+  '<div class="row" style="margin-bottom:14px"><div><h2 class="sec" style="color:'+ac+'">'+esc(a.title)+'</h2><div class="sub">'+esc(a.question)+'</div></div>'+
+    (standalone?'':'<div class="spacer"></div><button class="btn" onclick="go(\'library\')">Back to library</button>')+'</div>'+
+  '<div class="fg"><label class="fl">Student name / ID</label><input type="text" id="studentName" placeholder="e.g. Smith John_12345"></div>'+
+  '<div class="mk-wrap">'+
+    '<div class="mk-col-main">'+
+    '<div class="mk-card"><div class="bar bar-accent">'+barLabel+(isCk?(' · '+(a.scoreMode==='deduct'?'tap to flag errors':'tap to award')):'')+'</div><div class="body">'+
+      markBody+
+    '</div></div>'+
+    ckDedSection+
+    '</div>'+
+    '<div class="mk-col-side">'+
+    scoreStrip+
+    '<div class="mk-card"><div class="bar bar-accent">Feedback generator</div><div class="body">'+
+      '<label class="fl">Strengths</label><div class="chipbank">'+strengths+'</div>'+
+      '<label class="fl" style="margin-top:8px">Areas for improvement (each −1)</label><div class="chipbank">'+improvements+'</div>'+
+      sectionComments+
+      '<label class="fl" style="margin-top:8px">Student feedback (auto-assembled — editable)</label><textarea class="fb-out" id="fbOut" oninput="markEdited()"></textarea>'+
+      '<div class="row" style="margin-top:10px"><button class="btn primary sm" onclick="copyFB()">Copy feedback</button> <button class="btn sm" onclick="nextStudent()">Next student — clear all</button></div>'+
+      '<div class="fg" style="margin-top:14px"><label class="fl">Private marker notes (never copied to student)</label><textarea class="fb-out notes" id="privNotes" placeholder="Notes for yourself / moderation only"></textarea></div>'+
+    '</div></div>'+
+    '<div class="mk-card hours"><div class="bar bar-accent">Marking hours &amp; students tracker</div><div class="body">'+hours+
+      '<button class="btn sm" onclick="exportHoursCSV()">Export hours CSV</button></div></div>'+
+    '</div>'+
+  '</div>';
+}
+function htrackerMarkup(m,i,p){
+  var pr=(p.markers&&p.markers[i])||{done:0,entries:[]};
+  var pct=m.students?Math.min(100,Math.round(pr.done/m.students*100)):0;
+  var entries=(pr.entries||[]).map(function(e,j){return '<div class="hentry"><input type="number" value="'+e.h+'" oninput="setEntry('+i+','+j+',\'h\',this.value)"><input type="text" value="'+esc(e.note||'')+'" placeholder="note" oninput="setEntry('+i+','+j+',\'note\',this.value)"><button class="x" onclick="rmEntry('+i+','+j+')">×</button></div>'}).join('');
+  return '<div class="htracker" data-mi="'+i+'"><div class="top"><span class="nm">'+esc(m.name)+'</span><span class="al">allotted '+m.hours+'h</span>'+
+    '<div class="spacer"></div><div class="counter"><button onclick="bump('+i+',-1)">−</button><span><b id="done'+i+'">'+pr.done+'</b> / '+m.students+'</span><button onclick="bump('+i+',1)">+</button></div></div>'+
+    '<div class="progbar"><i id="bar'+i+'" style="width:'+pct+'%"></i></div>'+
+    '<div id="entries'+i+'">'+entries+'</div>'+
+    '<button class="btn sm addline" onclick="addEntry('+i+')">+ log hours</button></div>';
+}
+
+/* ---- runtime behaviour (used in preview AND exported file) ---- */
+var RT={a:null,p:null,save:function(){}};
+function wireRuntime(a,p,standalone){
+  RT.a=a;RT.p=p;
+  RT.save=standalone?function(){try{localStorage.setItem('mt_'+a.id,JSON.stringify(p))}catch(e){}}:function(){saveProg()};
+  if(!p.markers)p.markers=a.markers.map(function(){return{done:0,entries:[]}});
+  /* wire chip click handlers now that DOM exists */
+  a.strengths.forEach(function(_,i){
+    var el=document.getElementById('str'+i);
+    if(el)el.onclick=function(){toggleChip(this);recompute()};
+  });
+  a.improvements.forEach(function(_,i){
+    var el=document.getElementById('imp'+i);
+    if(el)el.onclick=function(){toggleChip(this);recompute()};
+  });
+  recompute();buildFeedback();
+  /* restore any extra deduction groups and per-group extras from session */
+  setTimeout(function(){
+    renderExtraDeds();
+    renderRestoreBtn();
+    var a=RT.a;var p=RT.p;
+    if(p.groupExtras){
+      (a.deductionGroups||[]).forEach(function(_,i){renderGroupExt('',i);renderGroupExt('ck',i)});
+    }
+  },0);
+}
+function toggleCrit(i){document.getElementById('crit'+i).classList.toggle('open')}
+function clearRadio(i){document.querySelectorAll('input[name=ded'+i+']').forEach(function(r){r.checked=false});recompute()}
+function clearCkRadio(i){document.querySelectorAll('input[name=ckded'+i+']').forEach(function(r){r.checked=false});recompute()}
+
+/* ---- hide / restore rubric deduction groups in marking ---- */
+function hideGroup(i){
+  var p=RT.p;if(!p.hiddenGroups)p.hiddenGroups={};
+  p.hiddenGroups[i]=true;RT.save();
+  /* re-render the deduction body without this group */
+  var a=RT.a;
+  var card=document.getElementById('grpext'+i);
+  if(card)card.closest('.dgroup').style.display='none';
+  renderRestoreBtn();recompute();
+}
+function hideCkGroup(i){
+  var p=RT.p;if(!p.hiddenGroups)p.hiddenGroups={};
+  p.hiddenGroups['ck'+i]=true;RT.save();
+  var card=document.getElementById('grpext_ck'+i);
+  if(card)card.closest('.dgroup').style.display='none';
+  renderRestoreBtn();recompute();
+}
+function renderRestoreBtn(){
+  var p=RT.p;var a=RT.a;
+  var el=document.getElementById('restoreBtn');if(!el)return;
+  var hidden=[];
+  (a.deductionGroups||[]).forEach(function(g,i){
+    if(p.hiddenGroups&&p.hiddenGroups[i])hidden.push({label:g.name,action:'restoreGroup('+i+')'});
+    if(p.hiddenGroups&&p.hiddenGroups['ck'+i])hidden.push({label:g.name,action:'restoreCkGroup('+i+')'});
+  });
+  if(!hidden.length){el.innerHTML='';return}
+  el.innerHTML='<div class="dd-wrap">'+
+    '<button class="btn sm" onclick="toggleDD(\'ddRestore\',event)">Restore ▾</button>'+
+    '<div class="dd-menu" id="ddRestore">'+
+      hidden.map(function(h){return '<button class="dd-item" onclick="'+h.action+';closeDD()">↩ '+esc(h.label)+'</button>'}).join('')+
+    '</div></div>';
+}
+function restoreGroup(i){
+  var p=RT.p;if(p.hiddenGroups)delete p.hiddenGroups[i];
+  RT.save();
+  /* show the group again — simplest is to re-render the whole marking view */
+  var a=RT.a;
+  document.getElementById('view-marking').innerHTML=runtimeMarkup(a,p,false);
+  setTimeout(function(){wireRuntime(a,p,false)},0);
+}
+function restoreCkGroup(i){
+  var p=RT.p;if(p.hiddenGroups)delete p.hiddenGroups['ck'+i];
+  RT.save();
+  var a=RT.a;
+  document.getElementById('view-marking').innerHTML=runtimeMarkup(a,p,false);
+  setTimeout(function(){wireRuntime(a,p,false)},0);
+}
+
+/* ---- per-group option adder ---- */
+function _grpExt(p,pfx,i){
+  if(!p.groupExtras)p.groupExtras={};
+  var k=pfx+i;
+  if(!p.groupExtras[k])p.groupExtras[k]=[];
+  return p.groupExtras[k];
+}
+function renderGroupExt(pfx,i){
+  var p=RT.p;
+  var ext=_grpExt(p,pfx,i);
+  var elId='grpext'+(pfx==='ck'?'_ck':'')+i;
+  var el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=ext.map(function(it,j){
+    return '<div class="dopt" style="gap:6px">'+
+      '<input type="checkbox" id="gext_'+pfx+i+'_'+j+'" value="'+it.penalty+'" onchange="recompute()">'+
+      '<input type="text" value="'+esc(it.label)+'" placeholder="Label" oninput="RT.p.groupExtras[\''+(pfx+i)+'\']['+j+'].label=this.value" style="flex:1;border:none;background:transparent;font-size:13px;padding:0">'+
+      '<input type="number" value="'+it.penalty+'" min="0" step="0.5" oninput="RT.p.groupExtras[\''+(pfx+i)+'\']['+j+'].penalty=parseFloat(this.value)||0;document.getElementById(\'gext_'+pfx+i+'_'+j+'\').value=this.value;recompute()" style="width:60px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px">'+
+      '<button class="x" onclick="rmGroupOpt(\''+pfx+'\','+i+','+j+')">×</button>'+
+    '</div>';
+  }).join('');
+}
+function addGroupOpt(i){_grpExt(RT.p,'',i).push({label:'',penalty:1});renderGroupExt('',i)}
+function addCkGroupOpt(i){_grpExt(RT.p,'ck',i).push({label:'',penalty:1});renderGroupExt('ck',i)}
+function rmGroupOpt(pfx,i,j){_grpExt(RT.p,pfx,i).splice(j,1);renderGroupExt(pfx,i);recompute()}
+
+/* ---- in-marking extra deductions ---- */
+function addExtraDed(type){
+  var a=RT.a;var p=RT.p;
+  if(!p.extraDeds)p.extraDeds=[];
+  p.extraDeds.push({name:'Extra deduction',type:type,items:type==='custom'?[]:[{label:'',penalty:1}]});
+  renderExtraDeds();RT.save();
+}
+function renderExtraDeds(){
+  var a=RT.a;var p=RT.p;
+  var el=document.getElementById('extraDedList');if(!el)return;
+  if(!p.extraDeds||!p.extraDeds.length){el.innerHTML='';return}
+  var offset=a.deductionGroups.length;
+  el.innerHTML=p.extraDeds.map(function(g,i){
+    var gi=offset+i;
+    var typeNote=g.type==='radio'
+      ?'<div class="typenote" style="margin-bottom:10px"><b>Radio — pick one.</b> Selecting another option clears the first. Use for mutually exclusive severities.</div>'
+      :g.type==='checkbox'
+      ?'<div class="typenote" style="margin-bottom:10px"><b>Checkbox — tick any.</b> Multiple options can be ticked and their penalties stack.</div>'
+      :'';
+    var hd='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+      '<input type="text" value="'+esc(g.name)+'" placeholder="Group name" oninput="RT.p.extraDeds['+i+'].name=this.value" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit">'+
+      '<select onchange="RT.p.extraDeds['+i+'].type=this.value;renderExtraDeds()" style="width:160px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit">'+
+        '<option value="checkbox"'+(g.type==='checkbox'?' selected':'')+'>checkbox (tick any)</option>'+
+        '<option value="radio"'+(g.type==='radio'?' selected':'')+'>radio (pick one)</option>'+
+        '<option value="custom"'+(g.type==='custom'?' selected':'')+'>custom (free text)</option>'+
+      '</select>'+
+      '<button class="x" onclick="rmExtraDed('+i+')">×</button></div>';
+    if(g.type==='custom'){
+      return '<div class="subcard" style="margin-bottom:10px">'+hd+
+        '<div style="display:grid;grid-template-columns:1fr 90px;gap:8px">'+
+          '<input type="text" id="customlbl'+gi+'" placeholder="Reason" oninput="recompute()" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit">'+
+          '<input type="number" id="custompen'+gi+'" placeholder="−" oninput="recompute()" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;text-align:center">'+
+        '</div></div>';
+    }
+    var rows='<div style="font-size:11px;color:var(--faint);font-weight:600;display:grid;grid-template-columns:1fr 90px 34px;gap:8px;margin-bottom:6px;padding:0 2px"><div>REASON</div><div>PENALTY</div><div></div></div>'+
+      g.items.map(function(it,j){
+        var inp=g.type==='radio'
+          ?'<input type="radio" name="ded'+gi+'" value="'+it.penalty+'" onchange="recompute()">'
+          :'<input type="checkbox" value="'+it.penalty+'" data-g="'+gi+'" onchange="recompute()">';
+        return '<div style="display:grid;grid-template-columns:34px 1fr 90px 34px;gap:8px;margin-bottom:7px;align-items:center">'+
+          '<label style="display:flex;justify-content:center">'+inp+'</label>'+
+          '<input type="text" value="'+esc(it.label)+'" placeholder="Label" oninput="RT.p.extraDeds['+i+'].items['+j+'].label=this.value;document.querySelector(\'[name=ded'+gi+']\')&&recompute()" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit">'+
+          '<input type="number" value="'+it.penalty+'" min="0" step="0.5" oninput="RT.p.extraDeds['+i+'].items['+j+'].penalty=parseFloat(this.value)||0;document.querySelectorAll(\'[name=ded'+gi+'],[data-g=\\\''+gi+'\\\']\').forEach(function(el){if(el.checked)el.value=RT.p.extraDeds['+i+'].items['+j+'].penalty});recompute()" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;text-align:center">'+
+          '<button class="x" onclick="rmExtraDedItem('+i+','+j+')">×</button>'+
+        '</div>';
+      }).join('');
+    var clr=g.type==='radio'?'<button class="btn sm addline" onclick="clearRadio('+gi+')" style="margin-bottom:8px">clear</button>':'';
+    return '<div class="subcard" style="margin-bottom:10px">'+hd+typeNote+rows+clr+
+      '<button class="btn sm addline" onclick="addExtraDedItem('+i+')">+ option</button></div>';
+  }).join('');
+}
+function addExtraDedItem(i){
+  if(!RT.p.extraDeds[i].items)RT.p.extraDeds[i].items=[];
+  RT.p.extraDeds[i].items.push({label:'',penalty:1});
+  renderExtraDeds();
+}
+function rmExtraDed(i){RT.p.extraDeds.splice(i,1);renderExtraDeds();recompute();RT.save()}
+function rmExtraDedItem(i,j){RT.p.extraDeds[i].items.splice(j,1);renderExtraDeds();recompute()}
+
+/* ---- structure checklist cycling (new model) ---- */
+var CK_CYCLES={additive:[1,0.5,0],deduct:[1,0.5,0]}; /* legacy fallback only */
+var CK_LABELS={additive:{},deduct:{}};                 /* legacy fallback only */
+function _lSteps(a){return a.labelSteps&&a.labelSteps.length?a.labelSteps:[1,0.5,0]}
+function _cSteps(a){return a.contentSteps&&a.contentSteps.length?a.contentSteps:[1,0]}
+function _stepClass(frac){return frac>=1?'correct':frac>0?'partial':'incorrect'}
+
+function cycleStructure(i){cycleItem(i,'l')} /* legacy shim for old exported tools */
+
+function cycleItem(si,kind,ci){
+  var a=RT.a;var p=RT.p;
+  var st=p.structs[si];
+  if(kind==='l'){
+    var steps=_lSteps(a);
+    /* deduct: starts idx0 (full), cycles forward through cuts */
+    /* additive: starts last idx (zero), cycles backward through awards */
+    var cur=st.li!=null?st.li:0;
+    var next=(cur+1)%steps.length;
+    st.li=next;
+    var frac=steps[next];
+    var lm=parseFloat(a.structures[si].labelMarks)||parseFloat(a.structures[si].marks)||0;
+    var btn=document.getElementById('sb'+si+'_l');
+    if(btn){btn.textContent=Math.round(lm*frac*100)/100+'';btn.className='sbtn '+_stepClass(frac)}
+  }else{
+    var csteps=_cSteps(a);
+    var cur2=st.ci[ci]!=null?st.ci[ci]:0;
+    var next2=(cur2+1)%csteps.length;
+    st.ci[ci]=next2;
+    var cfrac=csteps[next2];
+    var cm=parseFloat(a.structures[si].contents[ci].marks)||0;
+    var btn2=document.getElementById('sb'+si+'_c'+ci);
+    if(btn2){btn2.textContent=Math.round(cm*cfrac*100)/100+'';btn2.className='sbtn '+_stepClass(cfrac)}
+  }
+  RT.save();recompute();
+}
+function setStructBtn(){} /* no-op — buttons now self-update in cycleItem */
+
+function recompute(){
+  var a=RT.a;var p=RT.p;
+  var imps=document.querySelectorAll('.fchip.imp.on').length;
+  var final,ded=0;
+
+  /* sum per-group extra options */
+  function sumGroupExtras(pfx,count){
+    if(!p.groupExtras)return;
+    for(var i=0;i<count;i++){
+      var k=pfx+i;
+      (p.groupExtras[k]||[]).forEach(function(it,j){
+        var cb=document.getElementById('gext_'+pfx+i+'_'+j);
+        if(cb&&cb.checked)ded+=parseFloat(it.penalty)||0;
+      });
+    }
+  }
+  /* sum extra session deductions (shared by both types) */
+  function sumExtraDeds(){
+    var offset=a.deductionGroups.length;
+    (p.extraDeds||[]).forEach(function(g,i){
+      var gi=offset+i;
+      if(g.type==='custom'){var penEl=document.getElementById('custompen'+gi);ded+=penEl?parseFloat(penEl.value)||0:0;return}
+      if(g.type==='radio'){var r=document.querySelector('input[name=ded'+gi+']:checked');if(r)ded+=parseFloat(r.value)||0}
+      else{document.querySelectorAll('input[data-g="'+gi+'"]:checked').forEach(function(c){ded+=parseFloat(c.value)||0})}
+    });
+  }
+
+  if(a.type==='checklist'){
+    /* checklist deduction groups use ckded prefix */
+    (a.deductionGroups||[]).forEach(function(g,i){
+      if(p.hiddenGroups&&p.hiddenGroups['ck'+i])return;
+      if(g.type==='custom'){var penEl=document.getElementById('custompen_ck'+i);ded+=penEl?parseFloat(penEl.value)||0:0;return}
+      if(g.type==='radio'){var r=document.querySelector('input[name=ckded'+i+']:checked');if(r)ded+=parseFloat(r.value)||0}
+      else{document.querySelectorAll('input[data-ckg="'+i+'"]:checked').forEach(function(c){ded+=parseFloat(c.value)||0})}
+    });
+    sumExtraDeds();
+    sumGroupExtras('ck',a.deductionGroups.length);
+    var lSteps=_lSteps(a);var cSteps=_cSteps(a);
+    var total=0;var awarded=0;
+    (a.structures||[]).forEach(function(s,i){
+      var lm=parseFloat(s.labelMarks)||parseFloat(s.marks)||0;
+      total+=lm;
+      (s.contents||[]).forEach(function(c){total+=parseFloat(c.marks)||0});
+      var st=p.structs&&p.structs[i];if(!st)return;
+      var lFrac=lSteps[st.li!=null?st.li:0];
+      awarded+=lm*lFrac;
+      (s.contents||[]).forEach(function(c,j){
+        var cm=parseFloat(c.marks)||0;
+        var cFrac=cSteps[st.ci&&st.ci[j]!=null?st.ci[j]:0];
+        awarded+=cm*cFrac;
+      });
+    });
+    awarded=Math.max(0,Math.round((awarded-ded-imps)*100)/100);
+    total=Math.round(total*100)/100;
+    var vf=document.getElementById('vFinal');
+    var vb=document.getElementById('vBase');
+    if(vf)vf.textContent=awarded;
+    if(vb)vb.textContent=total;
+    final=awarded;
+  }else{
+    a.deductionGroups.forEach(function(g,i){
+      if(p.hiddenGroups&&p.hiddenGroups[i])return;
+      if(g.type==='custom'){var penEl=document.getElementById('custompen'+i);ded+=penEl?parseFloat(penEl.value)||0:0;return}
+      if(g.type==='radio'){var r=document.querySelector('input[name=ded'+i+']:checked');if(r)ded+=parseFloat(r.value)||0}
+      else{document.querySelectorAll('input[data-g="'+i+'"]:checked').forEach(function(c){ded+=parseFloat(c.value)||0})}
+    });
+    sumExtraDeds();
+    sumGroupExtras('',a.deductionGroups.length);
+    ded+=imps;
+    final=Math.max(0,a.baseScore-ded);
+    var vd2=document.getElementById('vDed'),vf3=document.getElementById('vFinal');
+    if(vd2)vd2.textContent=Math.round(ded*100)/100;if(vf3)vf3.textContent=(Math.round(final*100)/100);
+  }
+  buildFeedback();
+}
+function toggleChip(el){el.classList.toggle('on')}
+var fbEdited=false;
+function markEdited(){fbEdited=true}
+function buildFeedback(){
+  if(fbEdited)return;
+  var a=RT.a;var p=RT.p;
+  var final=parseFloat((document.getElementById('vFinal')||{}).textContent)||0;
+  var band=a.openingBands.find(function(b){return final>=b.min&&final<=b.max});
+  var parts=[];
+  if(band)parts.push(band.text);
+  /* score line */
+  var totalMarks=0;
+  if(a.type==='checklist'){
+    (a.structures||[]).forEach(function(s){
+      totalMarks+=parseFloat(s.labelMarks)||parseFloat(s.marks)||0;
+      (s.contents||[]).forEach(function(c){totalMarks+=parseFloat(c.marks)||0});
+    });
+  }else{
+    totalMarks=a.baseScore;
+  }
+  parts.push('Score: '+final+' / '+Math.round(totalMarks*100)/100);
+  var strs=[];document.querySelectorAll('.fchip:not(.imp).on').forEach(function(c){strs.push(c.textContent)});
+  if(strs.length)parts.push('Strengths: '+strs.join('; ')+'.');
+  var imps=[];document.querySelectorAll('.fchip.imp.on').forEach(function(c){imps.push(c.textContent)});
+  if(imps.length)parts.push('To improve: '+imps.join('; ')+'.');
+  /* for checklist, append feedback for structures that lost marks */
+  if(a.type==='checklist'){
+    var lSteps2=_lSteps(a);var cSteps2=_cSteps(a);
+    (a.structures||[]).forEach(function(s,i){
+      var st=p&&p.structs&&p.structs[i];if(!st)return;
+      var lFrac=lSteps2[st.li!=null?st.li:0];
+      if(lFrac<1&&s.lostFeedback)parts.push(s.lostFeedback);
+      (s.contents||[]).forEach(function(c,j){
+        var cFrac=cSteps2[st.ci&&st.ci[j]!=null?st.ci[j]:0];
+        if(cFrac<1&&c.lostFeedback)parts.push(c.lostFeedback);
+      });
+    });
+  }else{
+    a.criteria.forEach(function(c,i){var v=(document.getElementById('sc'+i)||{}).value;if(v&&v.trim())parts.push(c.title+': '+v.trim())});
+  }
+  var out=document.getElementById('fbOut');if(out)out.value=parts.join('\n\n');
+}
+function copyFB(){var t=document.getElementById('fbOut');t.select();try{document.execCommand('copy')}catch(e){}var b=event.target;var o=b.textContent;b.textContent='Copied ✓';setTimeout(function(){b.textContent=o},1200)}
+function nextStudent(){
+  var a=RT.a;var p=RT.p;
+  document.getElementById('studentName').value='';
+  if(a.type==='checklist'){
+    var lSteps3=_lSteps(a);var cSteps3=_cSteps(a);
+    var li0=a.scoreMode==='deduct'?0:lSteps3.length-1;
+    var ci0=a.scoreMode==='deduct'?0:cSteps3.length-1;
+    p.structs=a.structures.map(function(s){
+      return {li:li0,ci:(s.contents||[]).map(function(){return ci0})};
+    });
+    /* reset all buttons */
+    a.structures.forEach(function(s,i){
+      var lFrac=lSteps3[li0];var lm=parseFloat(s.labelMarks)||parseFloat(s.marks)||0;
+      var lb=document.getElementById('sb'+i+'_l');
+      if(lb){lb.textContent=Math.round(lm*lFrac*100)/100+'';lb.className='sbtn '+_stepClass(lFrac)}
+      (s.contents||[]).forEach(function(c,j){
+        var cFrac=cSteps3[ci0];var cm=parseFloat(c.marks)||0;
+        var cb=document.getElementById('sb'+i+'_c'+j);
+        if(cb){cb.textContent=Math.round(cm*cFrac*100)/100+'';cb.className='sbtn '+_stepClass(cFrac)}
+      });
+    });
+  }else{
+    document.querySelectorAll('.dopt input').forEach(function(x){x.checked=false});
+    document.querySelectorAll('[id^=customlbl],[id^=custompen]').forEach(function(x){x.value=''});
+    document.querySelectorAll('[id^=sc]').forEach(function(t){if(t.tagName==='TEXTAREA')t.value=''});
+  }
+  document.querySelectorAll('.fchip.on').forEach(function(c){c.classList.remove('on')});
+  document.getElementById('privNotes').value='';
+  /* clear extra deduction values but keep the groups */
+  document.querySelectorAll('#extraDedList input[type=radio],#extraDedList input[type=checkbox]').forEach(function(x){x.checked=false});
+  document.querySelectorAll('#extraDedList input[type=text],#extraDedList input[type=number]').forEach(function(x){x.value=''});
+  /* clear per-group extra checkboxes */
+  document.querySelectorAll('[id^=gext_]').forEach(function(x){if(x.type==='checkbox')x.checked=false});
+  fbEdited=false;
+  recompute();
+}
+/* hours tracker */
+function bump(i,n){var m=RT.a.markers[i];var pr=RT.p.markers[i];pr.done=Math.max(0,Math.min(m.students,pr.done+n));document.getElementById('done'+i).textContent=pr.done;var pct=m.students?Math.min(100,Math.round(pr.done/m.students*100)):0;document.getElementById('bar'+i).style.width=pct+'%';RT.save()}
+function addEntry(i){RT.p.markers[i].entries.push({h:0,note:''});refreshEntries(i)}
+function rmEntry(i,j){RT.p.markers[i].entries.splice(j,1);refreshEntries(i)}
+function setEntry(i,j,k,v){RT.p.markers[i].entries[j][k]=(k==='h'?(parseFloat(v)||0):v);RT.save()}
+function refreshEntries(i){
+  var pr=RT.p.markers[i];
+  var html=pr.entries.map(function(e,j){return '<div class="hentry"><input type="number" value="'+e.h+'" oninput="setEntry('+i+','+j+',\'h\',this.value)"><input type="text" value="'+esc(e.note||'')+'" placeholder="note" oninput="setEntry('+i+','+j+',\'note\',this.value)"><button class="x" onclick="rmEntry('+i+','+j+')">×</button></div>'}).join('');
+  document.getElementById('entries'+i).innerHTML=html;RT.save();
+}
+function exportHoursCSV(){
+  var a=RT.a,p=RT.p;
+  var rows=[['Marker','Allotted hours','Logged hours','Students done','Total students','Notes']];
+  a.markers.forEach(function(m,i){
+    var pr=p.markers[i];var logged=(pr.entries||[]).reduce(function(s,e){return s+(parseFloat(e.h)||0)},0);
+    var notes=(pr.entries||[]).map(function(e){return e.note}).filter(Boolean).join(' | ');
+    rows.push([m.name,m.hours,logged,pr.done,m.students,notes]);
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+  dl(csv,(a.title.replace(/\s+/g,'_'))+'_hours.csv','text/csv');
+}
+function dl(content,name,type){var b=new Blob([content],{type:type});var u=URL.createObjectURL(b);var x=document.createElement('a');x.href=u;x.download=name;x.click();URL.revokeObjectURL(u)}
+
+/* ============ EXPORT ============ */
+function exportClone(a){
+  var c=JSON.parse(JSON.stringify(a));
+  if(sec.anonymise){ c.markers=[]; if(Array.isArray(c.visibleTo))c.visibleTo='all'; }
+  return c;
+}
+function exportJSON(id){var a=find(id);var c=exportClone(a);dl(JSON.stringify(c,null,2),a.title.replace(/\s+/g,'_')+(sec.anonymise?'_anon':'')+'.json','application/json')}
+function importJSON(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var obj=JSON.parse(r.result);obj.id=uid();if(!obj.markers)obj.markers=[];if(!obj.criteria)obj.criteria=[];if(!obj.deductionGroups)obj.deductionGroups=[];if(!obj.openingBands)obj.openingBands=[];if(!obj.strengths)obj.strengths=[];if(!obj.improvements)obj.improvements=[];state.assessments.push(obj);saveAll();renderLibrary()}catch(e){alert('Could not read that JSON file.')}};r.readAsText(f)};
+  inp.click();
+}
+function exportHTML(id){
+  var a=exportClone(find(id));
+  /* The exported file shares the same CSS + runtime functions, baking the config in.
+     Built by string assembly; the closing script tag is split to avoid breaking THIS file. */
+  var css=(document.getElementById('app-css')||[].slice.call(document.querySelectorAll('style')).sort(function(a,b){return b.textContent.length-a.textContent.length})[0]).textContent;
+  var runtime=[
+    runtimeMarkup.toString(),htrackerMarkup.toString(),wireRuntime.toString(),toggleCrit.toString(),
+    clearRadio.toString(),clearCkRadio.toString(),
+    hideGroup.toString(),hideCkGroup.toString(),renderRestoreBtn.toString(),
+    restoreGroup.toString(),restoreCkGroup.toString(),
+    _grpExt.toString(),renderGroupExt.toString(),addGroupOpt.toString(),addCkGroupOpt.toString(),rmGroupOpt.toString(),
+    addExtraDed.toString(),renderExtraDeds.toString(),rmExtraDed.toString(),
+    addExtraDedItem.toString(),rmExtraDedItem.toString(),
+    'var CK_CYCLES='+JSON.stringify(CK_CYCLES)+';',
+    'var CK_LABELS='+JSON.stringify(CK_LABELS)+';',
+    _lSteps.toString(),_cSteps.toString(),_stepClass.toString(),
+    cycleStructure.toString(),cycleItem.toString(),setStructBtn.toString(),
+    recompute.toString(),toggleChip.toString(),markEdited.toString(),buildFeedback.toString(),
+    copyFB.toString(),nextStudent.toString(),bump.toString(),addEntry.toString(),rmEntry.toString(),setEntry.toString(),
+    refreshEntries.toString(),exportHoursCSV.toString(),dl.toString(),esc.toString()
+  ].join('\n');
+  var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'+esc(a.title)+'</title><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+
+    '<div class="topbar"><h1>'+esc(a.title)+'</h1><div class="cur" style="margin-left:auto">Marking tool · self-contained</div></div>'+
+    '<div class="wrap"><div id="view-marking"></div></div>'+
+    '<scr'+'ipt>'+
+    'var RT={a:null,p:null,save:function(){}};var fbEdited=false;'+
+    'var ASSESSMENT='+JSON.stringify(a)+';'+
+    'function go(){}'+
+    runtime+
+    ';(function(){var p={};try{var r=localStorage.getItem("mt_"+ASSESSMENT.id);if(r)p=JSON.parse(r)}catch(e){}'+
+    'document.getElementById("view-marking").innerHTML=runtimeMarkup(ASSESSMENT,p,true);'+
+    'setTimeout(function(){wireRuntime(ASSESSMENT,p,true)},0);})();'+
+    '</scr'+'ipt></body></html>';
+  dl(html,a.title.replace(/\s+/g,'_')+'_marking_tool.html','text/html');
+}
+
+/* ============ TOUR ============ */
+var TOUR=[
+  {view:'library',sel:'.brand .logo-sq',title:'Make it yours',
+   body:'Click the gold icon beside the name to pick a different logo glyph — a check, pencil, star and more. Your choice is remembered on this device.'},
+  {view:'library',sel:'#view-library .lib-sechead',title:'Your assessments',
+   body:'Everything you build lives here. Each card is a saved rubric — click ▶ Open & mark to start marking, or Edit to change the rubric. The pill by the title shows the type: deduction (video questions) or checklist (labelling).'},
+  {view:'library',sel:'#newAssessmentBtn',title:'Start a new assessment',
+   body:'+ New assessment opens a type picker — choose Video question (deduction, base 30, standard deduction groups pre-loaded) or Labelling / Annotation (structure checklist with configurable partial-credit steps). The rubric is seeded with sensible defaults so you only fill in your content.'},
+  {view:'library',sel:'.ex-box',before:function(){state.examplesOpen=true;renderLibGrid();},title:'Ready-made examples',
+   body:'The Examples box holds three finished rubrics. They are read-only: click 👁 View setup to see exactly how each was built, or use Duplicate to edit to spin off your own editable copy. They cannot be changed or deleted.'},
+  {view:'library',sel:'.ex-box .card .dd-wrap',before:function(){state.examplesOpen=true;renderLibGrid();},title:'More options — the ⋯ menu',
+   body:'The ⋯ button on each card holds Snapshot (a dated backup JSON), Duplicate, Export marking tool (HTML for your markers) and Export rubric (JSON for other builders). Delete appears on your own assessments.'},
+  {view:'setup',sel:'#pBasics',title:'Basics — type and scoring mode',
+   body:'Set the title, question, assessment type, and scoring mode here. Deduction-based works from a base score down. Checklist can be additive (tap to award) or deduct-from-total (tap to flag errors). The accent colour themes the generated marking tool.'},
+  {view:'setup',sel:'#pAnswerKey',title:'Answer key — for video / deduction questions',
+   body:'Each criterion has a model answer, required elements (green tags shown in marking view) and bonus elements (amber tags), plus a private note for markers only. This panel only shows for deduction-type assessments.'},
+  {view:'setup',sel:'#pFeedback',title:'Feedback banks',
+   body:'Strengths and improvement chips — the marker clicks these to build student feedback in one click. Each improvement chip also applies −1 to the score. The opening statement is chosen automatically from the score band the student falls in.'},
+  {view:'setup',sel:'#pMarkers',title:'Markers and hours',
+   body:'Add each marker with their allotted hours and total student count. These feed the progress bars and hours tracker in the marking view, and the CSV export at the end of marking.'},
+  {view:'setup',sel:'#tourPreviewBtn',title:'Preview before you save',
+   body:'👁 Preview shows exactly the marking tool this rubric will generate — live score, deductions and feedback — before you commit. Nothing is saved until you choose to. Your edits are also protected: press Ctrl+Z to undo (Ctrl+Shift+Z to redo), and if you cancel a new assessment by mistake it is auto-saved and offered back on the Library as “Restore unsaved draft”.'},
+  {view:'marking',sel:'.mk-card',title:'Marking view',
+   body:'For video questions: collapsible answer key, deduction groups, live score strip, feedback generator. For labelling questions: each structure shows a label button and content item buttons — tap to cycle through mark values. The score updates live.'},
+  {view:'marking',sel:'.score-strip',title:'Score strip and feedback',
+   body:'The score strip shows your running total. Below it the feedback generator auto-assembles an opening statement (by score band), selected strength and improvement chips, and any lost-mark notes from the structures. Everything is editable before you copy it.'},
+  {view:'library',sel:'.topbar .tab[data-v=info]',title:'Info & FAQs',
+   body:'The gold Info tab has a short explainer of how Marking Studio works plus answers to common questions — where your data lives, how to share a tool with co-markers, offline use, and moving rubrics between computers.'},
+  {view:'library',sel:'.dd-wrap',title:'Settings, import &amp; snapshots',
+   body:'The ⚙ Settings menu holds the admin tools: snapshot all assessments to a dated backup, import a rubric, and open Access &amp; Security to set roles, a passcode and encryption. Individual snapshots live in each card\'s ⋯ menu. That\'s the tour — explore from here.'}
+];
+var tourStep=0;
+function ensureTourEls(){
+  if(document.getElementById('tourBack'))return;
+  var back=document.createElement('div');back.className='tour-back';back.id='tourBack';
+  var spot=document.createElement('div');spot.className='tour-spot';spot.id='tourSpot';
+  var pop=document.createElement('div');pop.className='tour-pop';pop.id='tourPop';
+  document.body.appendChild(back);document.body.appendChild(spot);document.body.appendChild(pop);
+  back.onclick=endTour;
+}
+function startTour(){ensureTourEls();tourStep=0;document.getElementById('tourBack').classList.add('on');document.getElementById('tourPop').classList.add('on');showStep()}
+function endTour(){var b=document.getElementById('tourBack');if(b)b.classList.remove('on');var s=document.getElementById('tourSpot');if(s)s.style.display='none';var p=document.getElementById('tourPop');if(p)p.classList.remove('on')}
+function showStep(){
+  var st=TOUR[tourStep];
+  if(state.view!==st.view){ if(st.view==='setup'&&!state.draft){state.draftReadOnly=false;state.draft=JSON.parse(JSON.stringify(state.assessments[0]));state.editingId=state.draft.id} if(st.view==='marking'&&!state.markingId){state.markingId=state.assessments[0].id} go(st.view); }
+  if(st.before)st.before();
+  renderPop(st);                 /* draw controls first — always visible regardless of scroll */
+  setTimeout(function(){placeStep(st)},80);
+}
+function placeStep(st){
+  var t=st.sel?document.querySelector(st.sel):null;
+  var spot=document.getElementById('tourSpot');
+  if(!t){spot.style.display='none';return}
+  t.scrollIntoView({behavior:'smooth',block:'center'});
+  /* position the spotlight after the smooth scroll settles */
+  setTimeout(function(){
+    var r=t.getBoundingClientRect();var pad=6;
+    spot.style.display='block';
+    spot.style.top=(window.scrollY+r.top-pad)+'px';
+    spot.style.left=(window.scrollX+r.left-pad)+'px';
+    spot.style.width=(r.width+pad*2)+'px';
+    spot.style.height=(r.height+pad*2)+'px';
+  },280);
+}
+function renderPop(st){
+  var pop=document.getElementById('tourPop');
+  pop.innerHTML='<h4>'+esc(st.title)+'</h4><p>'+st.body+'</p>'+
+    '<div class="tnav"><span class="step-count">'+(tourStep+1)+' / '+TOUR.length+'</span>'+
+    '<button class="btn sm" onclick="endTour()">Skip</button>'+
+    (tourStep>0?'<button class="btn sm" onclick="tourPrev()">Back</button>':'')+
+    '<button class="btn sm primary" onclick="tourNext()">'+(tourStep===TOUR.length-1?'Done':'Next')+'</button></div>';
+}
+function tourNext(){if(tourStep<TOUR.length-1){tourStep++;showStep()}else endTour()}
+function tourPrev(){if(tourStep>0){tourStep--;showStep()}}
+
+/* ============ TEMPLATE IMPORT ============ */
+var VIDEO_DEFAULTS={
+  type:'deduction',scoreMode:'additive',structures:[],
+  baseScore:30,accent:'#1F3864',
+  deductionGroups:[
+    {name:'Anatomical accuracy',type:'radio',items:[{label:'Minor error',penalty:2},{label:'Major error',penalty:5},{label:'Multiple errors',penalty:8}]},
+    {name:'Mechanism explanation',type:'radio',items:[{label:'Partially correct',penalty:3},{label:'Incorrect or wrong side',penalty:6}]},
+    {name:'Presentation quality',type:'checkbox',items:[{label:'Unclear delivery',penalty:1},{label:'Illogical sequence',penalty:1},{label:'Reading from notes',penalty:1},{label:'No interaction with visuals',penalty:1}]},
+    {name:'Video quality',type:'checkbox',items:[{label:'Student not physically present in video',penalty:2},{label:'Poor audio quality',penalty:1},{label:'Poor video quality',penalty:1},{label:'Incorrect pronunciation of anatomical terms',penalty:1}]},
+    {name:'Timing',type:'radio',items:[{label:'Over or under length',penalty:2}]},
+    {name:'File requirements',type:'checkbox',items:[{label:'Not MP4 format',penalty:1},{label:'Student name not in filename',penalty:1},{label:'Student name not mentioned in assignment',penalty:1}]},
+    {name:'Custom deduction',type:'custom',items:[]}
+  ],
+  strengths:['Clear explanation of the mechanism','Accurate anatomy','Logical sequence','Good use of visuals','Confident delivery','Correct clinical correlation'],
+  improvements:['Clarify the explanation','Name the key structures','Correct the anatomical detail','Engage more with the visuals','Avoid reading from notes','Tighten the timing'],
+  openingBands:[
+    {min:27,max:30,text:'This is a strong, well-structured response that demonstrates a clear understanding of the topic and the relevant anatomy.'},
+    {min:22,max:26.99,text:'This is a solid response with a sound grasp of the key concepts; a few areas would benefit from greater precision.'},
+    {min:15,max:21.99,text:'This response addresses the question but contains gaps in anatomical detail or explanation that affect the overall clarity.'},
+    {min:0,max:14.99,text:'This response needs further development; several core elements require revision.'}
+  ],
+  markers:[
+    {name:'Vandana',hours:0,students:0},
+    {name:'Andy',hours:0,students:0},
+    {name:'Lucy',hours:0,students:0}
+  ]
+};
+
+var BLANK_TEMPLATE=
+'TITLE: Your assessment title here\n'+
+'QUESTION: Paste the full question or task description here.\n'+
+'\n'+
+'# Add one CRITERION block per marking section.\n'+
+'# REQUIRED elements are shown as green tags in the marking view.\n'+
+'# BONUS elements are shown as amber tags.\n'+
+'# NOTE is a private reminder visible only to markers.\n'+
+'\n'+
+'CRITERION: Section 1 name\n'+
+'MODEL: Write the model answer here — what a correct response looks like.\n'+
+'REQUIRED: Element one | Element two | Element three\n'+
+'BONUS: Optional bonus element\n'+
+'NOTE: Any private marking note for this criterion.\n'+
+'\n'+
+'CRITERION: Section 2 name\n'+
+'MODEL: Model answer for section 2.\n'+
+'REQUIRED: Expected element | Another expected element\n'+
+'BONUS: \n'+
+'NOTE: \n'+
+'\n'+
+'# Add more CRITERION blocks as needed.\n'+
+'# Everything else (deductions, feedback chips, score bands, markers)\n'+
+'# is filled in automatically using standard video-assessment defaults.\n'+
+'# You can edit all of it in the Setup tab after importing.\n';
+
+function downloadBlankTemplate(){
+  dl(BLANK_TEMPLATE,'marking_criteria_template.txt','text/plain');
+}
+
+function openImportModal(){
+  document.getElementById('importModal').classList.add('on');
+  document.getElementById('importPaste').value='';
+  document.getElementById('importPreview').innerHTML='';
+}
+function closeImportModal(){document.getElementById('importModal').classList.remove('on')}
+
+function parseTemplate(text){
+  /* Returns {title, question, criteria:[{title,model,required[],bonus[],note}], errors[]} */
+  var lines=text.split('\n');
+  var result={title:'',question:'',criteria:[],errors:[]};
+  var cur=null;
+  lines.forEach(function(raw){
+    var line=raw.trim();
+    if(!line||line.startsWith('#'))return;
+    var m;
+    if((m=line.match(/^TITLE:\s*(.+)/i))){result.title=m[1].trim();return}
+    if((m=line.match(/^QUESTION:\s*(.+)/i))){result.question=m[1].trim();return}
+    if((m=line.match(/^CRITERION:\s*(.+)/i))){
+      cur={title:m[1].trim(),model:'',required:[],bonus:[],note:''};
+      result.criteria.push(cur);return;
+    }
+    if(!cur)return;
+    if((m=line.match(/^MODEL:\s*(.*)/i))){cur.model=m[1].trim();return}
+    if((m=line.match(/^REQUIRED:\s*(.*)/i))){
+      cur.required=m[1].split('|').map(function(s){return s.trim()}).filter(Boolean);return;
+    }
+    if((m=line.match(/^BONUS:\s*(.*)/i))){
+      cur.bonus=m[1].split('|').map(function(s){return s.trim()}).filter(Boolean);return;
+    }
+    if((m=line.match(/^NOTE:\s*(.*)/i))){cur.note=m[1].trim();return}
+  });
+  if(!result.title)result.errors.push('No TITLE found — you can set it in Setup after importing.');
+  if(!result.criteria.length)result.errors.push('No CRITERION blocks found. Make sure each section starts with CRITERION: followed by the section name.');
+  return result;
+}
+
+var _parsedCriteria=null;
+function parseAndPreview(){
+  var text=document.getElementById('importPaste').value;
+  var parsed=parseTemplate(text);
+  _parsedCriteria=parsed;
+  var el=document.getElementById('importPreview');
+  var warn=parsed.errors.map(function(e){return '<div class="warn">⚠ '+esc(e)+'</div>'}).join('');
+  if(!parsed.criteria.length){el.innerHTML=warn+'<div class="warn">Nothing to import yet — check the format matches the template.</div>';return}
+  var prevItems=parsed.criteria.map(function(c){
+    var tags=(c.required||[]).map(function(t){return '<span class="chip-tag req">'+esc(t)+'</span>'}).join('')+
+             (c.bonus||[]).map(function(t){return '<span class="chip-tag bon">'+esc(t)+'</span>'}).join('');
+    return '<div class="crit-prev"><div class="cn">'+esc(c.title)+'</div>'+
+      (c.model?'<div class="cm">'+esc(c.model.slice(0,120))+(c.model.length>120?'…':'')+'</div>':'')+
+      (tags?'<div class="ctags">'+tags+'</div>':'')+'</div>';
+  }).join('');
+  el.innerHTML=warn+
+    '<div class="preview">'+
+      '<div style="font-weight:700;color:var(--navy);margin-bottom:10px">'+esc(parsed.title||'(no title)')+'</div>'+
+      prevItems+
+    '</div>'+
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:14px">Standard video-assessment deductions, feedback chips and score bands will be added automatically. Everything is editable in Setup.</div>'+
+    '<div class="acts">'+
+      '<button class="btn" onclick="closeImportModal()">Cancel</button>'+
+      '<button class="btn primary" onclick="confirmImport()">Import '+parsed.criteria.length+' criterion'+(parsed.criteria.length===1?'':'a')+' →</button>'+
+    '</div>';
+}
+
+function confirmImport(){
+  var p=_parsedCriteria;if(!p)return;
+  var a=JSON.parse(JSON.stringify(VIDEO_DEFAULTS));
+  a.id=uid();
+  a.title=p.title||'Imported assessment';
+  a.question=p.question||'';
+  a.criteria=p.criteria;
+  state.assessments.push(a);
+  saveAll();
+  state.draft=JSON.parse(JSON.stringify(a));
+  state.editingId=a.id;
+  state.draftReadOnly=false;
+  resetHistory();
+  closeImportModal();
+  go('setup');
+}
+
+/* ============ SNAPSHOT & TOAST ============ */
+var _toastTimer=null;
+function showToast(msg){
+  var t=document.getElementById('toast');if(!t)return;
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){t.classList.remove('on')},2800);
+}
+function snapshotOne(id){
+  var a=find(id);if(!a)return;
+  var ts=new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
+  dl(JSON.stringify(a,null,2),a.title.replace(/\s+/g,'_')+'_snapshot_'+ts+'.json','application/json');
+  showToast('📸 Snapshot saved — '+a.title);
+}
+function snapshotAll(){
+  var ts=new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
+  dl(JSON.stringify(state.assessments,null,2),'all_assessments_snapshot_'+ts+'.json','application/json');
+  showToast('📸 All '+state.assessments.length+' assessments snapshotted');
+}
+
+/* ============ LOGO GLYPH PICKER ============ */
+var GLYPHS=['✓','✎','★','◆','⬤','✚','⌘','✦','⬛','☑','✳','§'];
+function applyGlyph(g){var el=document.querySelector('.logo-sq');if(el)el.firstChild ? el.childNodes[0].nodeValue=g : el.textContent=g;el.textContent=g;}
+function currentGlyph(){try{return localStorage.getItem('mtb_logoglyph')||'✓'}catch(e){return '✓'}}
+function toggleGlyphPicker(e){
+  e.stopPropagation();
+  var p=document.getElementById('glyphPicker');if(!p)return;
+  if(p.style.display==='grid'){p.style.display='none';return;}
+  var cur=currentGlyph();
+  p.innerHTML=GLYPHS.map(function(g){return '<button class="glyph-opt'+(g===cur?' on':'')+'" onclick="chooseGlyph(\''+g+'\',event)">'+g+'</button>'}).join('');
+  p.style.display='grid';
+}
+function chooseGlyph(g,e){
+  e.stopPropagation();
+  try{localStorage.setItem('mtb_logoglyph',g)}catch(err){}
+  applyGlyph(g);
+  document.getElementById('glyphPicker').style.display='none';
+}
+document.addEventListener('click',function(){var p=document.getElementById('glyphPicker');if(p)p.style.display='none';});
+
+/* ============ ACCESS UI: LOCK / ROLES / UNLOCK ============ */
+function roleLabel(r){return r==='admin'?'Admin':r==='marker'?('Marker'+(session.markerName?' · '+session.markerName:'')):r==='viewer'?'View-only':'Locked';}
+function updateRoleBadge(){
+  var b=document.getElementById('roleBadge');if(!b)return;
+  if(!sec.setup){b.style.display='none';return;}
+  b.style.display='';
+  b.textContent='🔒 '+roleLabel(session.role);
+  b.title='Click to switch role / lock';
+}
+function renderLibSafe(){ if(state.view==='library')renderLibrary(); else go(state.view); updateRoleBadge(); }
+
+function showLock(mode){
+  var body=document.getElementById('lockBody'), sub=document.getElementById('lockSub');
+  var ov=document.getElementById('lockOverlay');
+  if(mode==='decrypt'){
+    sub.textContent='This copy is encrypted. Enter the passcode to unlock.';
+    body.innerHTML=
+      '<input type="password" id="lockPass" placeholder="Passcode" style="width:100%;text-align:center;margin-bottom:10px" onkeydown="if(event.key===\'Enter\')doDecrypt()">'+
+      '<div id="lockErr" style="color:#C0392B;font-size:12px;min-height:16px;margin-bottom:8px"></div>'+
+      '<button class="btn gold" style="width:100%" onclick="doDecrypt()">Unlock</button>';
+    ov.classList.add('on');setTimeout(function(){var el=document.getElementById('lockPass');if(el)el.focus();},60);
+    return;
+  }
+  /* role chooser */
+  sub.textContent='Choose how you\'re using the tool on this device.';
+  var names=rosterNames();
+  var markerPick=names.length
+    ? '<select id="lockName" style="width:100%;margin-bottom:8px"><option value="">— choose your name —</option>'+names.map(function(n){return '<option>'+esc(n)+'</option>'}).join('')+'</select>'
+    : '<input type="text" id="lockName" placeholder="Your name" style="width:100%;margin-bottom:8px">';
+  body.innerHTML=
+    '<div style="display:flex;flex-direction:column;gap:9px;text-align:left">'+
+      '<div class="role-card"><b>Admin</b><span>Full control — manage assessments, access and settings.'+(sec.passHash?' Passcode required.':'')+'</span>'+
+        (sec.passHash?'<input type="password" id="lockAdminPass" placeholder="Admin passcode" style="width:100%;margin-bottom:8px" onkeydown="if(event.key===\'Enter\')pickRole(\'admin\')">':'')+
+        '<button class="btn" style="width:100%" onclick="pickRole(\'admin\')">Continue as Admin</button></div>'+
+      '<div class="role-card"><b>Marker</b><span>Mark assigned assessments, edit rubrics, log hours.</span>'+markerPick+'<button class="btn" style="width:100%" onclick="pickRole(\'marker\')">Continue as Marker</button></div>'+
+      '<div class="role-card" onclick="pickRole(\'viewer\')"><b>View-only</b><span>Read assessments and rubrics; no marking or editing.</span></div>'+
+    '</div>'+
+    '<div id="lockErr" style="color:#C0392B;font-size:12px;min-height:16px;margin-top:8px"></div>';
+  ov.classList.add('on');
+}
+async function doDecrypt(){
+  var pass=(document.getElementById('lockPass')||{}).value||'';
+  var err=document.getElementById('lockErr');
+  if(!(await verifyPass(pass))){if(err)err.textContent='Incorrect passcode.';return;}
+  try{
+    _aesKey=await deriveAesKey(pass,sec.salt);
+    var ra=localStorage.getItem(LS_KEY), rp=localStorage.getItem(LS_PROG);
+    if(isEnc(ra))state.assessments=JSON.parse(await decStr(ra));
+    if(isEnc(rp))state.progress=JSON.parse(await decStr(rp));
+    normalizeAssessments();
+  }catch(e){if(err)err.textContent='Could not decrypt this data.';return;}
+  /* passcode holder is trusted; default to last role or admin */
+  var last=null;try{last=sessionStorage.getItem('mtb_role');}catch(e){}
+  if(last==='marker'||last==='viewer'){showLock('role');return;}
+  session.role='admin';persistSession();
+  document.getElementById('lockOverlay').classList.remove('on');
+  renderLibSafe();
+}
+async function pickRole(r){
+  var err=document.getElementById('lockErr');
+  if(r==='admin'){
+    if(sec.passHash){
+      var pass=(document.getElementById('lockAdminPass')||{}).value||'';
+      if(!(await verifyPass(pass))){if(err)err.textContent='Incorrect passcode.';return;}
+      if(sec.encrypt&&!_aesKey){try{_aesKey=await deriveAesKey(pass,sec.salt);}catch(e){}}
+    }
+    session.role='admin';session.markerName=null;
+  }else if(r==='marker'){
+    var nm=(document.getElementById('lockName')||{}).value||'';
+    if(!nm.trim()){if(err)err.textContent='Please choose or enter your name.';return;}
+    session.role='marker';session.markerName=nm.trim();
+  }else{session.role='viewer';session.markerName=null;}
+  persistSession();
+  document.getElementById('lockOverlay').classList.remove('on');
+  renderLibSafe();
+}
+function openLock(){ /* header badge → switch role */
+  if(!sec.setup)return;
+  if(sec.encrypt&&!_aesKey){showLock('decrypt');return;}
+  showLock('role');
+}
+function lockNow(){ session.role=(sec.setup?null:'admin'); try{sessionStorage.removeItem('mtb_role');sessionStorage.removeItem('mtb_markername');}catch(e){} bootAccess(); }
+
+/* ---- Access & Security panel (admin) ---- */
+function openSecurity(){ if(!can('access')){alert('Admin only.');return;} renderSecurity(); document.getElementById('securityModal').classList.add('on'); }
+function closeSecurity(){ document.getElementById('securityModal').classList.remove('on'); }
+function renderSecurity(){
+  var b=document.getElementById('securityBody');
+  var passSet=!!sec.passHash;
+  var vis=state.assessments.map(function(a){
+    var mode=Array.isArray(a.visibleTo)?'assigned':'all';
+    var names=rosterNames();
+    var chks=mode==='assigned'
+      ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+(names.length?names.map(function(n){
+          var on=a.visibleTo.indexOf(n)>=0;
+          return '<button class="lockchip" style="cursor:pointer;'+(on?'background:var(--gold);color:var(--navy);border-color:var(--gold)':'')+'" onclick="toggleAssign(\''+a.id+'\',\''+esc(n).replace(/\\'/g,"\\\\'")+'\')">'+esc(n)+'</button>';
+        }).join(''):'<span style="font-size:12px;color:var(--faint)">No marker names yet — add markers inside an assessment.</span>')+'</div>'
+      : '';
+    return '<div class="sec-row" style="display:block">'+
+      '<div style="display:flex;align-items:center;gap:8px"><b style="flex:1;color:var(--navy);font-size:13px">'+esc(a.title)+(isExample(a)?' <span class="lockchip">Example</span>':'')+'</b>'+
+        '<select onchange="setVisMode(\''+a.id+'\',this.value)" style="font-size:12px;padding:4px 6px">'+
+          '<option value="all"'+(mode==='all'?' selected':'')+'>Everyone</option>'+
+          '<option value="assigned"'+(mode==='assigned'?' selected':'')+'>Assigned markers</option>'+
+        '</select></div>'+chks+
+    '</div>';
+  }).join('');
+  b.innerHTML=
+    '<h4 style="margin:14px 0 4px;color:var(--navy);font-size:14px">Team</h4>'+
+    '<div class="msub" style="margin-bottom:6px">Names added here appear when assigning assessments and when someone unlocks as a Marker.</div>'+
+    '<div class="sec-row" style="display:block">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b style="flex:1;color:var(--navy);font-size:13px">Markers</b>'+
+        '<input type="text" id="newMarkerName" placeholder="Add marker name" style="font-size:12px;padding:5px 8px;width:170px" onkeydown="if(event.key===\'Enter\')addRosterMarker()">'+
+        '<button class="btn sm" onclick="addRosterMarker()">Add</button></div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+(rosterNames().length?rosterNames().map(function(n){
+        return '<span class="lockchip" style="display:inline-flex;align-items:center;gap:6px">'+esc(n)+' <span style="cursor:pointer;color:#C0392B;font-weight:700" title="Remove" onclick="rmRosterMarker(\''+esc(n).replace(/\\'/g,"\\\\'")+'\')">×</span></span>';
+      }).join(''):'<span style="font-size:12px;color:var(--faint)">No markers yet.</span>')+'</div>'+
+    '</div>'+
+    '<div class="sec-row" style="display:block">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b style="flex:1;color:var(--navy);font-size:13px">Admins</b>'+
+        '<input type="text" id="newAdminName" placeholder="Add admin name" style="font-size:12px;padding:5px 8px;width:170px" onkeydown="if(event.key===\'Enter\')addAdmin()">'+
+        '<button class="btn sm" onclick="addAdmin()">Add</button></div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+((sec.admins&&sec.admins.length)?sec.admins.map(function(n){
+        return '<span class="lockchip" style="display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-color:var(--navy)">'+esc(n)+' <span style="cursor:pointer;color:#F5C86B;font-weight:700" title="Remove" onclick="rmAdmin(\''+esc(n).replace(/\\'/g,"\\\\'")+'\')">×</span></span>';
+      }).join(''):'<span style="font-size:12px;color:var(--faint)">No admins listed. Anyone with the passcode below can act as Admin.</span>')+'</div>'+
+      '<div style="font-size:11.5px;color:var(--faint);margin-top:7px">This list records who is authorised as Admin. Unlocking as Admin still requires the shared passcode below.</div>'+
+    '</div>'+
+    '<h4 style="margin:18px 0 4px;color:var(--navy);font-size:14px">Admin passcode</h4>'+
+    '<div class="sec-row"><div class="sr-txt"><b>'+(passSet?'Passcode is set':'No passcode yet')+'</b><span>Whoever holds this passcode can act as Admin. Anyone else is limited to Marker or View-only.</span></div>'+
+      '<button class="btn sm" onclick="togglePcForm()">'+(passSet?'Change':'Set passcode')+'</button>'+(passSet?' <button class="btn sm danger" onclick="removePasscode()">Remove</button>':'')+'</div>'+
+    (_pcForm?'<div class="sec-row" style="display:block;background:var(--surface);margin:0 -6px;padding:12px 12px;border-radius:8px">'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+        '<input type="password" id="pc1" placeholder="New passcode" style="font-size:13px;padding:6px 9px;width:170px">'+
+        '<input type="password" id="pc2" placeholder="Confirm passcode" style="font-size:13px;padding:6px 9px;width:170px" onkeydown="if(event.key===\'Enter\')savePasscode()">'+
+        '<button class="btn sm gold" onclick="savePasscode()">Save</button>'+
+        '<button class="btn sm" onclick="togglePcForm()">Cancel</button>'+
+      '</div>'+
+      '<div id="pcErr" style="color:#C0392B;font-size:12px;margin-top:6px;min-height:14px"></div>'+
+    '</div>':'')+
+    '<h4 style="margin:18px 0 4px;color:var(--navy);font-size:14px">Data protection</h4>'+
+    '<div class="sec-row"><div class="sr-txt"><b>Encrypt saved data</b><span>Scrambles rubrics &amp; marking data in this browser so they can\'t be read without the passcode. If the passcode is lost, encrypted data cannot be recovered.</span></div>'+
+      '<button class="toggle'+(sec.encrypt?' on':'')+'" onclick="toggleEncrypt()" aria-label="Toggle encryption"></button></div>'+
+    '<div class="sec-row"><div class="sr-txt"><b>Anonymise on export</b><span>Removes student names/IDs from any exported marking tool or backup file.</span></div>'+
+      '<button class="toggle'+(sec.anonymise?' on':'')+'" onclick="toggleAnonymise()" aria-label="Toggle anonymise"></button></div>'+
+    '<div class="sec-row"><div class="sr-txt"><b>Clear all data on this device</b><span>Permanently removes every assessment and marking record from this browser. Cannot be undone.</span></div>'+
+      '<button class="btn sm danger" onclick="clearAllData()">Clear data</button></div>'+
+    '<h4 style="margin:18px 0 4px;color:var(--navy);font-size:14px">Who sees which assessment</h4>'+
+    '<div class="msub" style="margin-bottom:8px">Markers only see assessments set to “Everyone” or ones assigned to their name. Admin and View-only see all.</div>'+
+    vis;
+}
+var _pcForm=false;
+function togglePcForm(){_pcForm=!_pcForm;renderSecurity();if(_pcForm)setTimeout(function(){var el=document.getElementById('pc1');if(el)el.focus();},40);}
+function savePasscode(){
+  var p1=(document.getElementById('pc1')||{}).value||'', p2=(document.getElementById('pc2')||{}).value||'';
+  var err=document.getElementById('pcErr');
+  if(!p1.trim()){if(err)err.textContent='Passcode cannot be empty.';return;}
+  if(p1!==p2){if(err)err.textContent='Passcodes did not match.';return;}
+  hashPass(p1).then(function(h){
+    sec.passHash=h.hash;sec.salt=h.salt;sec.setup=true;saveSec();
+    deriveAesKey(p1,sec.salt).then(function(k){ _aesKey=k; if(sec.encrypt){saveAll();saveProg();} });
+    _pcForm=false;showToast('🔐 Passcode saved');renderSecurity();updateRoleBadge();
+  });
+}
+function removePasscode(){
+  if(sec.encrypt){alert('Turn off encryption first — it relies on the passcode.');return;}
+  if(!confirm('Remove the admin passcode? The tool will be fully open again.'))return;
+  sec.passHash=null;sec.salt=null;sec.setup=false;saveSec();session.role='admin';persistSession();
+  showToast('Passcode removed');renderSecurity();updateRoleBadge();
+}
+function toggleAnonymise(){ sec.anonymise=!sec.anonymise;saveSec();renderSecurity(); }
+function toggleEncrypt(){
+  if(!sec.encrypt){
+    if(!sec.passHash){alert('Set an admin passcode first — encryption uses it.');return;}
+    if(!_aesKey){alert('Re-enter your passcode first: click the role badge (top-right) to unlock as Admin, then try again.');return;}
+    sec.encrypt=true;saveSec();saveAll();saveProg();showToast('🔒 Data encrypted');renderSecurity();
+  }else{
+    if(!confirm('Turn off encryption? Data will be stored in plain text again.'))return;
+    sec.encrypt=false;saveSec();saveAll();saveProg();showToast('Encryption off');renderSecurity();
+  }
+}
+function clearAllData(){
+  if(!confirm('Delete ALL assessments and marking data from this browser? This cannot be undone.'))return;
+  if(!confirm('Really clear everything? Consider Export first.'))return;
+  try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_PROG);}catch(e){}
+  state.assessments=seed();state.progress={};normalizeAssessments();_aesKey=null;
+  if(sec.encrypt){sec.encrypt=false;saveSec();}
+  saveAll();saveProg();closeSecurity();showToast('All data cleared');go('library');
+}
+function setVisMode(id,mode){ var a=find(id);if(!a)return; a.visibleTo=(mode==='assigned'?[]:'all'); saveAll();renderSecurity();renderLibrary(); }
+function toggleAssign(id,name){ var a=find(id);if(!a||!Array.isArray(a.visibleTo))return; var i=a.visibleTo.indexOf(name); if(i>=0)a.visibleTo.splice(i,1);else a.visibleTo.push(name); saveAll();renderSecurity();renderLibrary(); }
+function addRosterMarker(){ var el=document.getElementById('newMarkerName'); var n=(el&&el.value||'').trim(); if(!n)return; if(!sec.roster)sec.roster=[]; if(sec.roster.indexOf(n)<0&&rosterNames().indexOf(n)<0)sec.roster.push(n); saveSec();renderSecurity(); }
+function rmRosterMarker(n){ if(sec.roster)sec.roster=sec.roster.filter(function(x){return x!==n}); var still=state.assessments.some(function(a){return (a.markers||[]).some(function(m){return m.name===n})}); if(still&&!confirm('“'+n+'” is also a marker inside one or more assessments and will still appear from there. Remove from the roster anyway?')){renderSecurity();return;} saveSec();renderSecurity(); }
+function addAdmin(){ var el=document.getElementById('newAdminName'); var n=(el&&el.value||'').trim(); if(!n)return; if(!sec.admins)sec.admins=[]; if(sec.admins.indexOf(n)<0)sec.admins.push(n); saveSec();renderSecurity(); }
+function rmAdmin(n){ if(sec.admins)sec.admins=sec.admins.filter(function(x){return x!==n}); saveSec();renderSecurity(); }
+
+function bootAccess(){
+  applyGlyph(currentGlyph());
+  if(sec.encrypt&&storedIsEncrypted()&&!_aesKey){ showLock('decrypt'); updateRoleBadge(); return; }
+  if(sec.setup&&!session.role){ showLock('role'); updateRoleBadge(); return; }
+  renderLibrary(); updateRoleBadge(); updateTabVisibility();
+}
+
+/* ============ BOOT ============ */
+bootAccess();
+</script>
+</body>
+</html>
